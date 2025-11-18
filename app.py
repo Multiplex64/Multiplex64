@@ -9,7 +9,7 @@ def get(page: str):
         with open(page, "r") as file:
             return file.read()
     except Exception:
-        with open("error404.html", "r") as file:
+        with open("main/error404.html", "r") as file:
             return file.read()
 
 
@@ -26,18 +26,18 @@ def main(path):
                 case "null":
                     del dir[0]
                     if not dir:
-                        return get("error404.html")
+                        return get("main/error404.html")
                     match dir[0]:
                         case "page":
                             del dir[0]
-                            if os.path.isfile("pages/" + "/".join(dir) + "/index.html"):
-                                return get("pages/" + "/".join(dir) + "/index.html")
+                            if os.path.isfile("main/pages/" + "/".join(dir) + "/index.html"):
+                                return get("main/pages/" + "/".join(dir) + "/index.html")
                             else:
-                                return get("error404.html")
+                                return get("main/error404.html")
                         case _:
-                            return get("error404.html")
+                            return get("main/error404.html")
                 case _:
-                    return get("_index.html").replace(
+                    return get("main/_index.html").replace(
                         "!pageContent",
                         main("null/page/" + "/".join(dir)),
                     )
