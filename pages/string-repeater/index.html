@@ -1,0 +1,24 @@
+String Repeater
+<br><br>
+Input
+<br>
+<textarea id="input">hello, world!</textarea>
+<br>
+Repetitions
+<br>
+<input id="reps" type="number" value="3">
+<br>
+<button onclick="repeat();">Go!</button>
+<br><br>
+Output
+<br>
+<textarea id="output"></textarea>
+<script>
+    function repeat(){
+        input = document.getElementById("input")
+        reps = document.getElementById("reps")
+        output = document.getElementById("output")
+        output.value = input.value.repeat(reps.value)
+    }
+    repeat();
+</script>
