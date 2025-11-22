@@ -1,5 +1,6 @@
 from flask import Flask, abort, request
 import os
+import git
 
 # flask install required!
 
@@ -43,6 +44,17 @@ def main(path):
                     )
         case "POST":
             match dir[0]:
+                case "null":
+                    del dir[0]
+                    if not dir:
+                        abort(404)
+                    match dir[0]:
+                        case "server-update":
+                            repo = git.Repo('https://github.com/Multiplex64/Multiplex64')
+                            origin = repo.remotes.origin
+                            origin.pull()
+                        case _:
+                            abort(404)
                 case _:
                     abort(404)
         case _:
