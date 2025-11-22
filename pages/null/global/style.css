@@ -1,0 +1,144 @@
+body,
+button,
+input,
+textarea {
+    font-family: "Courier New", monospace;
+    font-size:16px;
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+#__topBar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 32px;
+    background-color: #f0f0f0;
+    width: 100%;
+    z-index: 101;
+    border-bottom: solid 1px;
+    display: flex;
+    color: black;
+    overflow-y: hidden;
+}
+
+.__topButton {
+    border: 0;
+    border-color: black;
+    width: 32px;
+    height: 32px;
+    border-radius: 0;
+    font-size: 24px;
+    overflow-y: hidden;
+    position: fixed;
+    color: black;
+}
+
+#__navBar {
+    height: 100%;
+    width: 0px;
+    z-index: 100;
+    top: 32px;
+    left: 0;
+    background-color: #f0f0f0;
+    overflow: hidden;
+    transition: width 0.5s, border 0s 0.5s;
+    position: fixed;
+    border-right: solid 0px;
+    white-space: nowrap;
+}
+
+.__navOpen #__navBar {
+    transition: width 0.5s, border 0s 0s;
+    width: 255px;
+    border-right: solid 1px;
+}
+
+#__main {
+    position: fixed;
+    top: 32px;
+    bottom: 0;
+    right: 0;
+    padding: 0;
+    transition: left 0.5s;
+    left: 0;
+    overflow-y: scroll;
+}
+
+.__navOpen #__main {
+    left: 255px;
+}
+
+.__topButtonL {
+    border-right: solid 1px;
+}
+
+.__topButtonR {
+    border-left: solid 1px;
+}
+
+.banner {
+    font-size: 16px;
+    background-color: yellow;
+    margin-top: 16px;
+}
+
+.banner:empty {
+    display: none;
+}
+
+#__search {
+    /*
+    width: calc(100% - 288px);
+    hieght: 30px;
+    */
+    border: 0;
+    left: 256px;
+    right: 32px;
+    top: 0;
+    bottom: 0;
+    position: absolute;
+    font-size: 16px;
+}
+
+#__homeButton {
+    width: 224px;
+    left: 32px;
+}
+
+#__homeButton::before {
+    content: "Multiplex64";
+    font-style: italic;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+@media only screen and (max-width: 640px) {
+    .__navOpen #__navBar {
+        width: 100%;
+    }
+
+    .__navOpen #__main {
+        left: 0;
+    }
+
+    #__topBar > button:not(#navButton, #__homeButton) {
+        display: none;
+    }
+
+    #__search {
+        border: 0;
+        left: 64px;
+        right: 0;
+    }
+
+    #__homeButton {
+        width: 32px;
+    }
+
+    #__homeButton::before {
+        content: "M";
+    }
+}

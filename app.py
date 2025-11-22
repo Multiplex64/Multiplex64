@@ -1,8 +1,8 @@
-from flask import Flask, abort, request
+from flask import Flask, abort, request, send_from_directory
 import os
 import git
 
-# flask install required!
+# flask and GitPython install required!
 
 
 def get(page: str):
@@ -10,7 +10,7 @@ def get(page: str):
         with open(page, "r") as file:
             return file.read()
     except Exception:
-        with open("main/error404.html", "r") as file:
+        with open("pages/null/errors/404.html", "r") as file:
             return file.read()
 
 
@@ -23,25 +23,15 @@ def main(path):
     dir = path.split("/")
     match request.method:
         case "GET":
-            match dir[0]:
-                case "null":
-                    del dir[0]
-                    if not dir:
-                        return get("main/error404.html")
-                    match dir[0]:
-                        case "page":
-                            del dir[0]
-                            if os.path.isfile("main/pages/" + "/".join(dir) + "/index.html"):
-                                return get("main/pages/" + "/".join(dir) + "/index.html")
-                            else:
-                                return get("main/error404.html")
-                        case _:
-                            return get("main/error404.html")
-                case _:
-                    return get("main/_index.html").replace(
-                        "!pageContent",
-                        main("null/page/" + "/".join(dir)),
-                    )
+            if os.path.splitext("/".join(dir))[1]:
+                if os.path.isfile("pages/"+"/".join(dir)):
+                    return send_from_directory("pages","/".join(dir))
+                return get("pages/null/errors/404.html")
+            else:
+                return get("pages/null/global/index.html").replace(
+                    "!pageContent",
+                    get("pages/" + "/".join(dir) + "/index.html"),
+                )
         case "POST":
             match dir[0]:
                 case "null":
@@ -50,7 +40,7 @@ def main(path):
                         abort(404)
                     match dir[0]:
                         case "server-update":
-                            repo = git.Repo('https://github.com/Multiplex64/Multiplex64')
+                            repo = git.Repo('https://github.com/Multiplex64/Multiplex64/')
                             origin = repo.remotes.origin
                             origin.pull()
                             return 'Updated PythonAnywhere successfully', 200
