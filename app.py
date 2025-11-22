@@ -53,6 +53,7 @@ def main(path):
                             repo = git.Repo('https://github.com/Multiplex64/Multiplex64')
                             origin = repo.remotes.origin
                             origin.pull()
+                            return 'Updated PythonAnywhere successfully', 200
                         case _:
                             abort(404)
                 case _:
