@@ -2,7 +2,7 @@ from flask import Flask, abort, request, send_from_directory
 import os
 import git
 
-# flask and GitPython install required!
+# Flask and GitPython install required! (Through Pip)
 
 
 def get(page: str):
@@ -24,8 +24,8 @@ def main(path):
     match request.method:
         case "GET":
             if os.path.splitext("/".join(dir))[1]:
-                if os.path.isfile("pages/"+"/".join(dir)):
-                    return send_from_directory("pages","/".join(dir))
+                if os.path.isfile("pages/" + "/".join(dir)):
+                    return send_from_directory("pages", "/".join(dir))
                 return get("pages/null/errors/404.html")
             else:
                 return get("pages/null/global/index.html").replace(
@@ -40,10 +40,12 @@ def main(path):
                         abort(404)
                     match dir[0]:
                         case "server-update":
-                            repo = git.Repo('https://github.com/Multiplex64/Multiplex64/')
+                            repo = git.Repo(
+                                "https://github.com/Multiplex64/Multiplex64/"
+                            )
                             origin = repo.remotes.origin
                             origin.pull()
-                            return 'Updated PythonAnywhere successfully', 200
+                            return "Updated PythonAnywhere successfully", 200
                         case _:
                             abort(404)
                 case _:

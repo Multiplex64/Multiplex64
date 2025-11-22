@@ -3,7 +3,7 @@ button,
 input,
 textarea {
     font-family: "Courier New", monospace;
-    font-size:16px;
+    font-size: 16px;
 }
 
 button:hover {
@@ -124,7 +124,7 @@ button:hover {
         left: 0;
     }
 
-    #__topBar > button:not(#navButton, #__homeButton) {
+    #__topBar>button:not(#navButton, #__homeButton) {
         display: none;
     }
 
