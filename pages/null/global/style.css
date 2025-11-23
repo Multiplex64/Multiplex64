@@ -6,6 +6,12 @@ textarea {
     font-size: 16px;
 }
 
+body {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
 button:hover {
     cursor: pointer;
 }
@@ -79,21 +85,7 @@ button:hover {
     border-left: solid 1px;
 }
 
-.banner {
-    font-size: 16px;
-    background-color: yellow;
-    margin-top: 16px;
-}
-
-.banner:empty {
-    display: none;
-}
-
 #__search {
-    /*
-    width: calc(100% - 288px);
-    hieght: 30px;
-    */
     border: 0;
     left: 256px;
     right: 32px;
