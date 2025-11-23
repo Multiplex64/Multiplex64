@@ -27,8 +27,7 @@ function __setInnerHTML(elm, html) {
 async function __goto(loc) {
     window.history.pushState({}, "", loc);
     try {
-        nextURL = new URL("./" + loc, window.location)
-        const response = await fetch("./" + nextURL.pathname + "/index.html");
+        const response = await fetch((loc.split("q")[0]+"/index.html").replace(/\/{2,}/g, "/"));
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
