@@ -54,6 +54,7 @@ button:hover {
     position: fixed;
     border-right: solid 0px;
     white-space: nowrap;
+    text-align:left;
 }
 
 .__navOpen #__navBar {

@@ -27,7 +27,7 @@ function __setInnerHTML(elm, html) {
 async function __goto(loc) {
     window.history.pushState({}, "", loc);
     try {
-        const response = await fetch((loc.split("q")[0]+"/index.html").replace(/\/{2,}/g, "/"));
+        const response = await fetch((loc.split("q")[0] + "/index.html").replace(/\/{2,}/g, "/"));
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
@@ -40,6 +40,7 @@ async function __goto(loc) {
 }
 
 function __checkSearch() {
+    // Deprecated, replacement needed
     if (event.key === "Enter") {
         __search();
     }
