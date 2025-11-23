@@ -40,11 +40,8 @@ def main(path):
                         abort(404)
                     match dir[0]:
                         case "server-update":
-                            repo = git.Repo(
-                                "https://github.com/Multiplex64/Multiplex64/"
-                            )
-                            origin = repo.remotes.origin
-                            origin.pull()
+                            repo = git.cmd.Git("https://github.com/Multiplex64/Multiplex64/")
+                            repo.pull()
                             return "Updated PythonAnywhere successfully", 200
                         case _:
                             abort(404)
