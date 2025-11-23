@@ -1,9 +1,11 @@
-Search for: <p id="searched"></p>
-<br><br>
-Search feature is currently unavailable.
-<script>
-    element = document.getElementById("searched")
-    queryString = window.location.search;
-    urlParams = new URLSearchParams(queryString);
-    element.innerHTML = urlParams.get('q')
-</script>
+<div class="__standard">
+    Search for: <p id="searched"></p>
+    <br><br>
+    Search feature is currently unavailable.
+    <script>
+        element = document.getElementById("searched")
+        queryString = window.location.search;
+        urlParams = new URLSearchParams(queryString);
+        element.innerHTML = urlParams.get('q')
+    </script>
+</div>

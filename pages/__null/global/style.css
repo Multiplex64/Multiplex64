@@ -9,7 +9,6 @@ textarea {
 body {
     margin: 0;
     padding: 0;
-    text-align: center;
 }
 
 button:hover {
@@ -28,6 +27,7 @@ button:hover {
     display: flex;
     color: black;
     overflow-y: hidden;
+    align-items: center;
 }
 
 .__topButton {
@@ -40,6 +40,11 @@ button:hover {
     overflow-y: hidden;
     position: fixed;
     color: black;
+    display: block;
+    text-decoration: none;
+    box-sizing: border-box;
+    line-height: 32px;
+    text-align: center;
 }
 
 #__navBar {
@@ -54,7 +59,7 @@ button:hover {
     position: fixed;
     border-right: solid 0px;
     white-space: nowrap;
-    text-align:left;
+    text-align: left;
 }
 
 .__navOpen #__navBar {
@@ -74,6 +79,12 @@ button:hover {
     overflow-y: scroll;
 }
 
+.__standard {
+    max-width: 1024px;
+    width: 100%;
+    margin: auto
+}
+
 .__navOpen #__main {
     left: 255px;
 }
@@ -89,7 +100,7 @@ button:hover {
 #__search {
     border: 0;
     left: 256px;
-    right: 32px;
+    right: 0;
     top: 0;
     bottom: 0;
     position: absolute;
@@ -99,16 +110,12 @@ button:hover {
 #__homeButton {
     width: 224px;
     left: 32px;
-}
-
-#__homeButton::before {
-    content: "Multiplex64";
     font-style: italic;
     font-weight: bold;
     text-decoration: underline;
 }
 
-@media only screen and (max-width: 640px) {
+@media only screen and (max-width: 768px) {
     .__navOpen #__navBar {
         width: 100%;
     }
@@ -117,21 +124,13 @@ button:hover {
         left: 0;
     }
 
-    #__topBar>button:not(#navButton, #__homeButton) {
+    #__topBar>button:not(#__navButton) {
         display: none;
     }
 
     #__search {
         border: 0;
-        left: 64px;
+        left: 32px;
         right: 0;
-    }
-
-    #__homeButton {
-        width: 32px;
-    }
-
-    #__homeButton::before {
-        content: "M";
     }
 }

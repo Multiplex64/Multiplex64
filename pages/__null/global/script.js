@@ -1,4 +1,10 @@
 function __init() {
+    window.addEventListener('popstate', function () {
+        __goMainContent(window.location.pathname)
+    }, false);
+}
+
+function __load() {
     ele = document.getElementById("__search")
     if (window.location.pathname == "/search") {
         queryString = window.location.search;
@@ -9,6 +15,7 @@ function __init() {
     }
 }
 __init();
+__load();
 
 function __setInnerHTML(elm, html) {
     elm.innerHTML = html;
@@ -24,18 +31,30 @@ function __setInnerHTML(elm, html) {
         });
 }
 
+async function __goMainContent(loc) {
+    const response = await fetch((loc.split("q")[0] + "/index.html").replace(/\/{2,}/g, "/"));
+    if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+    }
+    val = await response.text();
+    __setInnerHTML(document.getElementById("__main"), val)
+    __load();
+}
+
 async function __goto(loc) {
-    window.history.pushState({}, "", loc);
-    try {
-        const response = await fetch((loc.split("q")[0] + "/index.html").replace(/\/{2,}/g, "/"));
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
+    urlDetect = new RegExp('^(?:[a-z+]+:)?//', 'i');
+    if (urlDetect.test(loc)) {
+        userConfirm = confirm("You are leaving Multiplex64. Are you sure you want to proceed?");
+        if (userConfirm) {
+            window.location.href = loc;
         }
-        val = await response.text();
-        __setInnerHTML(document.getElementById("__main"), val)
-        __init();
-    } catch (error) {
-        console.error(error.message);
+    } else {
+        window.history.pushState({}, "", loc);
+        try {
+            __goMainContent(loc)
+        } catch (error) {
+            console.error(error.message);
+        }
     }
 }
 
@@ -52,7 +71,7 @@ function __search() {
 }
 __navBar = 0;
 
-function toggleNav() {
+function __toggleNav() {
     if (__navBar == 1) {
         __navBar = 0;
         document.body.classList.remove("__navOpen");
@@ -61,6 +80,7 @@ function toggleNav() {
         document.body.classList.add("__navOpen");
     }
 }
+
 async function __getData(url) {
     try {
         const response = await fetch(url);

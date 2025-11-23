@@ -10,7 +10,7 @@ def get(page: str):
         with open(page, "r") as file:
             return file.read()
     except Exception:
-        with open("pages/null/errors/404.html", "r") as file:
+        with open("pages/__null/errors/404.html", "r") as file:
             return file.read()
 
 
@@ -26,21 +26,23 @@ def main(path):
             if os.path.splitext("/".join(dir))[1]:
                 if os.path.isfile("pages/" + "/".join(dir)):
                     return send_from_directory("pages", "/".join(dir))
-                return get("pages/null/errors/404.html")
+                return get("pages/__null/errors/404.html")
             else:
-                return get("pages/null/global/index.html").replace(
+                return get("pages/__null/global/index.html").replace(
                     "!pageContent",
                     get("pages/" + "/".join(dir) + "/index.html"),
                 )
         case "POST":
             match dir[0]:
-                case "null":
+                case "__null":
                     del dir[0]
                     if not dir:
                         abort(404)
                     match dir[0]:
                         case "server-update":
-                            repo = git.cmd.Git("https://github.com/Multiplex64/Multiplex64/")
+                            repo = git.cmd.Git(
+                                "https://github.com/Multiplex64/Multiplex64/"
+                            )
                             repo.pull()
                             return "Updated PythonAnywhere successfully", 200
                         case _:
