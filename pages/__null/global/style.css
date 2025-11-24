@@ -79,14 +79,8 @@ button:hover {
     overflow-y: scroll;
 }
 
-.__standard {
-    max-width: 1024px;
-    width: 100%;
-    margin: auto
-}
-
 .__navOpen #__main {
-    left: 255px;
+    left: 256px;
 }
 
 .__topButtonL {
@@ -113,6 +107,13 @@ button:hover {
     font-style: italic;
     font-weight: bold;
     text-decoration: underline;
+}
+
+.__standard {
+    max-width: 1024px;
+    width: 100%;
+    margin: auto;
+    padding: 8px;
 }
 
 @media only screen and (max-width: 768px) {
