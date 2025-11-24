@@ -5,6 +5,13 @@ function __init() {
 }
 
 function __load() {
+    anchors = document.querySelectorAll("a")
+    for (var i = 0; i < anchors.length; i++) {
+        anchor = anchors[i]
+        if (!/^(tel:|mailto:|sms:|javascript:)/.test(anchor.href)) {
+            anchor.href = "javascript:__goto('" + anchor.getAttribute("href") + "')"
+        }
+    }
     ele = document.getElementById("__search")
     if (window.location.pathname == "/search") {
         queryString = window.location.search;
