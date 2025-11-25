@@ -1,4 +1,4 @@
-from flask import Flask, abort, request, send_from_directory
+import flask
 import os
 import git
 
@@ -14,49 +14,58 @@ def get(page: str):
 
 
 def error404():
-    with open("pages/__null/404.html", "r") as file:
-        return file.read(), 404
+    try:
+        with open("pages/__null/404.html", "r") as file:
+            return file.read(), 404
+    except Exception:
+        return "Error 404 Not Found (File System Failure)", 404
 
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 
 
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def main(path):
-    dir = path.split("/")
-    match request.method:
-        case "GET":
-            if os.path.splitext("/".join(dir))[1]:
-                if os.path.isfile("pages/" + "/".join(dir)):
-                    return send_from_directory("pages", "/".join(dir))
+    try:
+        dir = path.split("/")
+        match flask.request.method:
+            case "GET":
+                if os.path.splitext("/".join(dir))[1]:
+                    if os.path.isfile("pages/" + "/".join(dir)):
+                        return flask.send_from_directory("pages", "/".join(dir))
+                    else:
+                        return error404()
                 else:
-                    return error404()
-            else:
-                pageContent = get("pages/" + "/".join(dir) + "/index.html")
-                if not isinstance(pageContent, tuple):
-                    pageContent = (pageContent, None)
+                    pageContent = get("pages/" + "/".join(dir) + "/index.html")
+                    if not isinstance(pageContent, tuple):
+                        pageContent = (pageContent, None)
 
-                return get("pages/__null/index.html").replace(
-                    "!pageContent",
-                    pageContent[0],
-                ), pageContent[1]
-        case "POST":
-            match dir[0]:
-                case "__null":
-                    del dir[0]
-                    if not dir:
-                        abort(404)
-                    match dir[0]:
-                        case "server-update":
-                            repo = git.cmd.Git(
-                                "https://github.com/Multiplex64/Multiplex64/"
-                            )
-                            repo.pull()
-                            return "Updated PythonAnywhere successfully", 200
-                        case _:
-                            abort(404)
-                case _:
-                    abort(404)
-        case _:
-            abort(405)
+                    return (
+                        get("pages/__null/index.html").replace(
+                            "!pageContent",
+                            pageContent[0],
+                        ),
+                        pageContent[1],
+                    )
+            case "POST":
+                match dir[0]:
+                    case "__null":
+                        del dir[0]
+                        if not dir:
+                            flask.abort(404)
+                        match dir[0]:
+                            case "server-update":
+                                repo = git.cmd.Git(
+                                    "https://github.com/Multiplex64/Multiplex64/"
+                                )
+                                repo.pull()
+                                return "Updated PythonAnywhere successfully", 200
+                            case _:
+                                flask.abort(404)
+                    case _:
+                        flask.abort(404)
+            case _:
+                flask.abort(405)
+    except Exception:
+        return "Error 500 Internal Server Error (Flask Handler Error)", 500
