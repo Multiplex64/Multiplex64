@@ -10,8 +10,12 @@ def get(page: str):
         with open(page, "r") as file:
             return file.read()
     except Exception:
-        with open("pages/__null/errors/404.html", "r") as file:
-            return file.read()
+        return error404()
+
+
+def error404():
+    with open("pages/__null/404.html", "r") as file:
+        return file.read(), 404
 
 
 app = Flask(__name__)
@@ -26,12 +30,17 @@ def main(path):
             if os.path.splitext("/".join(dir))[1]:
                 if os.path.isfile("pages/" + "/".join(dir)):
                     return send_from_directory("pages", "/".join(dir))
-                return get("pages/__null/errors/404.html")
+                else:
+                    return error404()
             else:
-                return get("pages/__null/global/index.html").replace(
+                pageContent = get("pages/" + "/".join(dir) + "/index.html")
+                if not isinstance(pageContent, tuple):
+                    pageContent = (pageContent, None)
+
+                return get("pages/__null/index.html").replace(
                     "!pageContent",
-                    get("pages/" + "/".join(dir) + "/index.html"),
-                )
+                    pageContent[0],
+                ), pageContent[1]
         case "POST":
             match dir[0]:
                 case "__null":

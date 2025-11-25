@@ -39,7 +39,11 @@ function __setInnerHTML(elm, html) {
 }
 
 async function __goMainContent(loc) {
-    const response = await fetch((loc.split("q")[0] + "/index.html").replace(/\/{2,}/g, "/"));
+    splitLocation = loc.split("?")
+    const response = await fetch(
+        (splitLocation[0] + "/index.html").replace(/\/{2,}/g, "/")
+        + (typeof splitLocation[1] === "undefined" ? "" : "?" + splitLocation[1])
+    );
     if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
     }
