@@ -1,3 +1,5 @@
+/* Global Styles */
+
 body,
 button,
 input,
@@ -11,9 +13,15 @@ body {
     padding: 0;
 }
 
+textarea {
+    width: 100%;
+}
+
 button:hover {
     cursor: pointer;
 }
+
+/* System Styles */
 
 #__topBar {
     position: fixed;
@@ -109,12 +117,16 @@ button:hover {
     text-decoration: underline;
 }
 
-.__standard {
+/* Program Styles */
+
+._standard {
     max-width: 1024px;
     width: 100%;
     margin: auto;
     padding: 8px;
 }
+
+/* Small Screens */
 
 @media only screen and (max-width: 768px) {
     .__navOpen #__navBar {

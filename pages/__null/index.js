@@ -1,3 +1,5 @@
+// System Scripts
+
 function __init() {
     window.addEventListener('popstate', function () {
         __goMainContent(window.location.pathname)
@@ -9,7 +11,7 @@ function __load() {
     for (var i = 0; i < anchors.length; i++) {
         anchor = anchors[i]
         if (!/^(tel:|mailto:|sms:|javascript:)/.test(anchor.href)) {
-            anchor.href = "javascript:__goto('" + anchor.getAttribute("href") + "')"
+            anchor.href = "javascript:_goto('" + anchor.getAttribute("href") + "')"
         }
     }
     ele = document.getElementById("__search")
@@ -21,8 +23,10 @@ function __load() {
         ele.value = ""
     }
 }
+
 __init();
 __load();
+__navBar = 0;
 
 function __setInnerHTML(elm, html) {
     elm.innerHTML = html;
@@ -52,7 +56,31 @@ async function __goMainContent(loc) {
     __load();
 }
 
-async function __goto(loc) {
+function __checkSearch() {
+    // Deprecated, replacement needed
+    if (event.key === "Enter") {
+        __search();
+    }
+}
+
+function __search() {
+    ele = document.getElementById("__search")
+    _goto("/search?q=" + encodeURIComponent(ele.value.trim()));
+}
+
+function __toggleNav() {
+    if (__navBar == 1) {
+        __navBar = 0;
+        document.body.classList.remove("__navOpen");
+    } else {
+        __navBar = 1;
+        document.body.classList.add("__navOpen");
+    }
+}
+
+// Program Scripts
+
+async function _goto(loc) {
     urlDetect = new RegExp('^(?:[a-z+]+:)?//', 'i');
     if (urlDetect.test(loc)) {
         userConfirm = confirm("You are leaving Multiplex64. Are you sure you want to proceed?");
@@ -69,29 +97,6 @@ async function __goto(loc) {
     }
 }
 
-function __checkSearch() {
-    // Deprecated, replacement needed
-    if (event.key === "Enter") {
-        __search();
-    }
-}
-
-function __search() {
-    ele = document.getElementById("__search")
-    __goto("/search?q=" + encodeURIComponent(ele.value.trim()));
-}
-__navBar = 0;
-
-function __toggleNav() {
-    if (__navBar == 1) {
-        __navBar = 0;
-        document.body.classList.remove("__navOpen");
-    } else {
-        __navBar = 1;
-        document.body.classList.add("__navOpen");
-    }
-}
-
 async function __getData(url) {
     try {
         const response = await fetch(url);
@@ -104,6 +109,7 @@ async function __getData(url) {
         console.error(error.message);
     }
 }
+
 async function __postData(url, data) {
     try {
         const response = await fetch(url, {
