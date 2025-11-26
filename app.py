@@ -42,7 +42,7 @@ def main(path):
                         pageContent = (pageContent, None)
 
                     return (
-                        get("pages/__null/index.html").replace(
+                        get("pages/__null/_index.html").replace(
                             "!pageContent",
                             pageContent[0],
                         ),
