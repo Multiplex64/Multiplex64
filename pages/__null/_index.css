@@ -15,6 +15,7 @@ body {
 
 textarea {
     width: 100%;
+    resize: vertical;
 }
 
 button:hover {
