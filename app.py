@@ -31,23 +31,43 @@ def main(path):
         dir = path.split("/")
         match flask.request.method:
             case "GET":
-                if os.path.splitext("/".join(dir))[1]:
-                    if os.path.isfile("pages/" + "/".join(dir)):
-                        return flask.send_from_directory("pages", "/".join(dir))
-                    else:
-                        return error404()
-                else:
-                    pageContent = get("pages/" + "/".join(dir) + "/index.html")
-                    if not isinstance(pageContent, tuple):
-                        pageContent = (pageContent, None)
+                match dir[0]:
+                    case "__null":
+                        del dir[0]
+                        if not dir:
+                            return error404()
+                        match dir[0]:
+                            case "page":
+                                del dir[0]
+                                if os.path.isfile(
+                                    "pages/" + "/".join(dir) + "/index.html"
+                                ):
+                                    return get("pages/" + "/".join(dir) + "/index.html")
+                                else:
+                                    return error404()
+                            case "file":
+                                del dir[0]
+                                if os.path.splitext("/".join(dir))[1]:
+                                    if os.path.isfile("pages/" + "/".join(dir)):
+                                        return flask.send_from_directory(
+                                            "pages", "/".join(dir)
+                                        )
+                                    else:
+                                        return error404()
+                            case _:
+                                return error404()
+                    case _:
+                        pageContent = get("pages/" + "/".join(dir) + "/index.html")
+                        if not isinstance(pageContent, tuple):
+                            pageContent = (pageContent, None)
 
-                    return (
-                        get("pages/__null/_index.html").replace(
-                            "!pageContent",
-                            pageContent[0],
-                        ),
-                        pageContent[1],
-                    )
+                        return (
+                            get("pages/__null/_index.html").replace(
+                                "!pageContent",
+                                pageContent[0],
+                            ),
+                            pageContent[1],
+                        )
             case "POST":
                 match dir[0]:
                     case "__null":

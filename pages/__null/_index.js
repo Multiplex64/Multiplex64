@@ -43,11 +43,8 @@ function __setInnerHTML(elm, html) {
 }
 
 async function __goMainContent(loc) {
-    splitLocation = loc.split("?")
-    const response = await fetch(
-        (splitLocation[0] + "/index.html").replace(/\/{2,}/g, "/")
-        + (typeof splitLocation[1] === "undefined" ? "" : "?" + splitLocation[1])
-    );
+    // Needs support for relative paths
+    const response = await fetch("/__null/page/" + loc);
     if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
     }
@@ -97,7 +94,7 @@ async function _goto(loc) {
     }
 }
 
-async function __getData(url) {
+async function _getData(url) {
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -110,7 +107,7 @@ async function __getData(url) {
     }
 }
 
-async function __postData(url, data) {
+async function _postData(url, data) {
     try {
         const response = await fetch(url, {
             method: "POST",
