@@ -15,7 +15,7 @@ def get(page: str):
 
 def error404():
     try:
-        with open("pages/__null/404.html", "r") as file:
+        with open("global/404.html", "r") as file:
             return file.read(), 404
     except Exception:
         return "Error 404 Not Found (File System Failure)", 404
@@ -37,6 +37,15 @@ def main(path):
                         if not dir:
                             return error404()
                         match dir[0]:
+                            case "global":
+                                del dir[0]
+                                if os.path.splitext("/".join(dir))[1]:
+                                    if os.path.isfile("global/" + "/".join(dir)):
+                                        return flask.send_from_directory(
+                                            "global", "/".join(dir)
+                                        )
+                                    else:
+                                        return error404()
                             case "page":
                                 del dir[0]
                                 if os.path.isfile(
@@ -62,7 +71,7 @@ def main(path):
                             pageContent = (pageContent, None)
 
                         return (
-                            get("pages/__null/_index.html").replace(
+                            get("global/_index.html").replace(
                                 "!pageContent",
                                 pageContent[0],
                             ),
