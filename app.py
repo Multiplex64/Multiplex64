@@ -88,7 +88,7 @@ def main(path):
                                 repo = git.cmd.Git(
                                     "https://github.com/Multiplex64/Multiplex64/"
                                 )
-                                repo.pull()
+                                repo.pull('origin','main')
                                 return "Updated PythonAnywhere successfully", 200
                             case _:
                                 flask.abort(404)
