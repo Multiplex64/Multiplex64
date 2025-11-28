@@ -1,6 +1,7 @@
 // System Scripts
 
 function __init() {
+    __navBar = 0;
     window.addEventListener('popstate', function () {
         __goMainContent(window.location.pathname)
     }, false);
@@ -11,7 +12,10 @@ function __load() {
     for (var i = 0; i < anchors.length; i++) {
         anchor = anchors[i]
         if (!/^(tel:|mailto:|sms:|javascript:)/.test(anchor.href)) {
-            anchor.href = "javascript:_goto('" + anchor.getAttribute("href") + "')"
+            anchor.addEventListener("click", function () {
+                _goto(this.getAttribute("href"))
+                event.preventDefault();
+            }, false);
         }
     }
     ele = document.getElementById("__search")
@@ -24,9 +28,10 @@ function __load() {
     }
 }
 
-__init();
-__load();
-__navBar = 0;
+document.addEventListener("DOMContentLoaded", function () {
+    __init();
+    __load();
+});
 
 function __setInnerHTML(elm, html) {
     elm.innerHTML = html;
