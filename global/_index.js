@@ -16,7 +16,7 @@ function __load() {
                 anchor.classList.add("__linkListenerApplied")
                 anchor.addEventListener("click", function () {
                     _goto(this.getAttribute("href"))
-                    console.log("excecuted")
+                    // Deprecated, replacement needed
                     event.preventDefault();
                 }, false);
             }
