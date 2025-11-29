@@ -11,11 +11,15 @@ function __load() {
     anchors = document.querySelectorAll("a")
     for (var i = 0; i < anchors.length; i++) {
         anchor = anchors[i]
-        if (!/^(tel:|mailto:|sms:|javascript:)/.test(anchor.href)) {
-            anchor.addEventListener("click", function () {
-                _goto(this.getAttribute("href"))
-                event.preventDefault();
-            }, false);
+        if (!anchor.classList.contains("__linkListenerApplied")) {
+            if (!/^(tel:|mailto:|sms:|javascript:)/.test(anchor.href)) {
+                anchor.classList.add("__linkListenerApplied")
+                anchor.addEventListener("click", function () {
+                    _goto(this.getAttribute("href"))
+                    console.log("excecuted")
+                    event.preventDefault();
+                }, false);
+            }
         }
     }
     ele = document.getElementById("__search")

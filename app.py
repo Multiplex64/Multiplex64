@@ -3,8 +3,6 @@ import os
 import git
 import json
 
-# Flask and GitPython install required! (Through Pip)
-
 
 def replace(inputText, **toInsert):
     text = inputText
