@@ -28,10 +28,11 @@ button:hover {
     position: fixed;
     top: 0;
     left: 0;
-    height: 32px;
+    height: 30px;
     background-color: #f0f0f0;
     width: 100%;
     z-index: 101;
+    border-top: solid 1px;
     border-bottom: solid 1px;
     display: flex;
     color: black;
@@ -42,8 +43,9 @@ button:hover {
 .__topButton {
     border: 0;
     border-color: black;
+    background-color: #f0f0f0;
     width: 32px;
-    height: 32px;
+    height: 30px;
     border-radius: 0;
     font-size: 24px;
     overflow-y: hidden;
@@ -52,7 +54,7 @@ button:hover {
     display: block;
     text-decoration: none;
     box-sizing: border-box;
-    line-height: 32px;
+    line-height: 30px;
     text-align: center;
 }
 

@@ -31,10 +31,11 @@ def error(e=500, msg=""):
                 str(e),
             )
     except Exception:
-        return "500 Internal Server Error - Critical Failure of Error Handling System.", 500
+        return (
+            "500 Internal Server Error - Critical Failure of Error Handling System.",
+            500,
+        )
 
-
-print(error(400))
 
 app = flask.Flask(__name__)
 
