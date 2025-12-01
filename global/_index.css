@@ -13,6 +13,27 @@ body {
     padding: 0;
 }
 
+button,
+input,
+textarea {
+    border-width: 1px;
+    border-color: black;
+    border-radius: 4px;
+}
+
+input,
+textarea {
+    &:focus {
+        outline: solid #2080f0 2px;
+        outline-offset: -2px;
+    }
+
+    &:is(:-webkit-autofill, :autofill) {
+        outline: solid #f08020 2px;
+        outline-offset: -2px;
+    }
+}
+
 textarea {
     width: 100%;
     resize: vertical;
@@ -31,7 +52,6 @@ button:hover {
     height: 30px;
     background-color: #f0f0f0;
     width: 100%;
-    z-index: 101;
     border-top: solid 1px;
     border-bottom: solid 1px;
     display: flex;
@@ -64,7 +84,7 @@ button:hover {
     z-index: 100;
     top: 32px;
     left: 0;
-    background-color: #f0f0f0;
+    background-color: #ffffff;
     overflow: hidden;
     transition: width 0.5s, border 0s 0.5s;
     position: fixed;
@@ -103,6 +123,7 @@ button:hover {
 }
 
 #__search {
+    border-radius: 0;
     border: 0;
     left: 256px;
     right: 0;
@@ -110,6 +131,7 @@ button:hover {
     bottom: 0;
     position: absolute;
     font-size: 16px;
+    padding: 4px;
 }
 
 #__homeButton {
