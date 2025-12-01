@@ -19,6 +19,7 @@ textarea {
     border-width: 1px;
     border-color: black;
     border-radius: 4px;
+    border-style: solid;
 }
 
 input,
@@ -37,10 +38,20 @@ textarea {
 textarea {
     width: 100%;
     resize: vertical;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #f0f0f0;
 }
 
 button:hover {
     cursor: pointer;
+    background-color: #e8e8e8;
+}
+
+button:active {
+    background-color: #e0e0e0;
 }
 
 /* System Styles */
@@ -145,10 +156,11 @@ button:hover {
 /* Program Styles */
 
 ._standard {
-    max-width: 1024px;
+    max-width: 1040px;
     width: 100%;
     margin: auto;
     padding: 8px;
+    box-sizing: border-box;
 }
 
 /* Small Screens */
