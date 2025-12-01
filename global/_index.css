@@ -84,7 +84,7 @@ button:hover {
     z-index: 100;
     top: 32px;
     left: 0;
-    background-color: #ffffff;
+    background-color: #f0f0f0;
     overflow: hidden;
     transition: width 0.5s, border 0s 0.5s;
     position: fixed;
