@@ -53,7 +53,7 @@ function __setInnerHTML(elm, html) {
 
 async function __goMainContent(loc) {
     // Needs support for relative paths
-    const response = await fetch("/__null/page/" + loc);
+    const response = await fetch("/_null/page/" + loc);
     if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
     }

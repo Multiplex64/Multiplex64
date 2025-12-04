@@ -48,7 +48,7 @@ def main(path):
         match flask.request.method:
             case "GET":
                 match dir[0]:
-                    case "__null":
+                    case "_null":
                         del dir[0]
                         if not dir:
                             return error(404)
@@ -100,7 +100,7 @@ def main(path):
                             )
             case "POST":
                 match dir[0]:
-                    case "__null":
+                    case "_null":
                         del dir[0]
                         if not dir:
                             flask.abort(404)
