@@ -1,0 +1,64 @@
+<div class="_standard">
+    Number Analyzer
+    <br><br>
+    Input
+    <br>
+    <input type="number" id="input" value="60">
+    <br><br>
+    <button onclick="analyzeNum();">Go!</button>
+    <br><br>
+    Output
+    <br>
+    <div id="output"></div>
+</div>
+<script>
+    function analyzeNum() {
+        input = document.getElementById("input")
+        output = document.getElementById("output")
+        num = Number(input.value)
+        output.innerHTML = ("Value: " + num
+            + "<br> Prime Factors: " + primeFactors(num)
+            + "<br> Divisible By: " + divisibleBy(num))
+    }
+    function divisibleBy(n) {
+        if (Number.isInteger(n)) {
+            if (n <= Number.MAX_SAFE_INTEGER) {
+                const factors = [];
+                for (i = 1; i < n; i++) {
+                    if (n % i == 0) {
+                        factors.push(i);
+                    }
+                }
+                factors.push(n);
+                return factors.toString();
+            } else {
+                return "Error: Number too large"
+            }
+        } else {
+            return "Error: Not an integer"
+        }
+    }
+    function primeFactors(n) {
+        if (Number.isInteger(n)) {
+            if (n <= Number.MAX_SAFE_INTEGER) {
+                const factors = [];
+                let divisor = 2;
+
+                while (n >= 2) {
+                    if (n % divisor == 0) {
+                        factors.push(divisor);
+                        n = n / divisor;
+                    } else {
+                        divisor++;
+                    }
+                }
+                return factors.toString();
+            } else {
+                return "Error: Number too large"
+            }
+        } else {
+            return "Error: Not an integer"
+        }
+    }
+    analyzeNum()
+</script>
