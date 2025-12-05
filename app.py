@@ -81,7 +81,7 @@ def main(path):
                             return error(404)
                         match dir[0]:
                             case "test":
-                                return "Test OK!", 200
+                                return "GET Test OK!", 200
                             case "global":
                                 del dir[0]
                                 if os.path.splitext("/".join(dir))[1]:
@@ -135,7 +135,7 @@ def main(path):
                             flask.abort(404)
                         match dir[0]:
                             case "test":
-                                return {"response": "Test OK!"}, 200
+                                return {"response": "POST Test OK!"}, 200
                             case "server-update":
                                 repo = git.cmd.Git(
                                     "https://github.com/Multiplex64/Multiplex64/"
