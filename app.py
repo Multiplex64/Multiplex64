@@ -137,6 +137,25 @@ def main(path):
                             case "test":
                                 return {"response": "POST Test OK!"}, 200
                             case "server-update":
+                                abort_code = 403
+                                if "X-Github-Event" not in flask.request.headers:
+                                    flask.abort(abort_code)
+                                if "X-Github-Delivery" not in flask.request.headers:
+                                    flask.abort(abort_code)
+                                if "X-Hub-Signature" not in flask.request.headers:
+                                    flask.abort(abort_code)
+                                if not flask.request.is_json:
+                                    flask.abort(abort_code)
+                                if "User-Agent" not in flask.request.headers:
+                                    flask.abort(abort_code)
+                                ua = flask.request.headers.get("User-Agent")
+                                if not ua.startswith("GitHub-Hookshot/"):
+                                    flask.abort(abort_code)
+                                event = flask.request.headers.get("X-GitHub-Event")
+                                if event == "ping":
+                                    return json.dumps({"Response": "Ping OK!"})
+                                if event != "push":
+                                    return json.dumps({"Response": "Wrong event type"})
                                 repo = git.cmd.Git(
                                     "https://github.com/Multiplex64/Multiplex64/"
                                 )
