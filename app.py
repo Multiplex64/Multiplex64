@@ -40,8 +40,35 @@ def error(e=500, msg=""):
 app = flask.Flask(__name__)
 
 
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
+@app.route(
+    "/",
+    defaults={"path": ""},
+    methods=[
+        "GET",
+        "HEAD",
+        "POST",
+        "PUT",
+        "DELETE",
+        "CONNECT",
+        "OPTIONS",
+        "TRACE",
+        "PATCH",
+    ],
+)
+@app.route(
+    "/<path:path>",
+    methods=[
+        "GET",
+        "HEAD",
+        "POST",
+        "PUT",
+        "DELETE",
+        "CONNECT",
+        "OPTIONS",
+        "TRACE",
+        "PATCH",
+    ],
+)
 def main(path):
     try:
         dir = path.split("/")
@@ -53,6 +80,8 @@ def main(path):
                         if not dir:
                             return error(404)
                         match dir[0]:
+                            case "test":
+                                return "Test OK!", 200
                             case "global":
                                 del dir[0]
                                 if os.path.splitext("/".join(dir))[1]:
@@ -105,6 +134,8 @@ def main(path):
                         if not dir:
                             flask.abort(404)
                         match dir[0]:
+                            case "test":
+                                return {"response": "Test OK!"}, 200
                             case "server-update":
                                 repo = git.cmd.Git(
                                     "https://github.com/Multiplex64/Multiplex64/"
@@ -116,6 +147,6 @@ def main(path):
                     case _:
                         flask.abort(404)
             case _:
-                flask.abort(405)
+                return error(405)
     except Exception:
         return error(500, "Flask Handler Error")
