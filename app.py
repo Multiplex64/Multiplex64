@@ -142,8 +142,7 @@ def main(path):
                                     flask.abort(abort_code)
                                 if "X-Github-Delivery" not in flask.request.headers:
                                     flask.abort(abort_code)
-                                if "X-Hub-Signature" not in flask.request.headers:
-                                    flask.abort(abort_code)
+
                                 if not flask.request.is_json:
                                     flask.abort(abort_code)
                                 if "User-Agent" not in flask.request.headers:
@@ -151,13 +150,13 @@ def main(path):
                                 ua = flask.request.headers.get("User-Agent")
                                 if not ua.startswith("GitHub-Hookshot/"):
                                     flask.abort(abort_code)
-                                    
+
                                 event = flask.request.headers.get("X-GitHub-Event")
                                 if event == "ping":
                                     return json.dumps({"Response": "Ping OK!"})
                                 if event != "push":
                                     return json.dumps({"Response": "Wrong event type"})
-                                
+
                                 repo = git.cmd.Git(
                                     "https://github.com/Multiplex64/Multiplex64/"
                                 )
@@ -169,6 +168,5 @@ def main(path):
                         flask.abort(404)
             case _:
                 return error(405)
-    except Exception as e:
-        print(e)
+    except Exception:
         return error(500, "Flask Handler Error")
