@@ -15,7 +15,8 @@ body {
 
 button,
 input,
-textarea {
+textarea,
+iframe {
     border-width: 1px;
     border-color: black;
     border-radius: 4px;
@@ -35,7 +36,8 @@ textarea {
     }
 }
 
-textarea {
+textarea,
+iframe {
     width: 100%;
     resize: vertical;
     box-sizing: border-box;
@@ -43,15 +45,15 @@ textarea {
 
 button {
     background-color: #f0f0f0;
-}
 
-button:hover {
-    cursor: pointer;
-    background-color: #e8e8e8;
-}
+    &:hover {
+        cursor: pointer;
+        background-color: #e8e8e8;
+    }
 
-button:active {
-    background-color: #e0e0e0;
+    &:active {
+        background-color: #e0e0e0;
+    }
 }
 
 /* System Styles */

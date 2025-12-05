@@ -1,0 +1,15 @@
+<div class="_standard">
+    HTML Playground
+    <br><br>
+    Output
+    <iframe id="html-iframe" style="height:50vh"></iframe>
+    HTML
+    <textarea id="html-input" oninput="insertHTML(this.value)" rows="16">Hello, world!</textarea>
+    <script>
+        function insertHTML(value){
+            output = document.getElementById("html-iframe")
+            output.srcdoc = value;
+        }
+        insertHTML(document.getElementById("html-input").value)
+    </script>
+</div>
