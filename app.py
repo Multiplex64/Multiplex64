@@ -81,7 +81,7 @@ def main(path):
                             return error(404)
                         match dir[0]:
                             case "test":
-                                return "GET Test OK!", 200
+                                return "GET Test OK!!!", 200
                             case "global":
                                 del dir[0]
                                 if os.path.splitext("/".join(dir))[1]:
