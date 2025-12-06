@@ -110,6 +110,15 @@ def main(path):
                                         return error(404)
                             case _:
                                 return error(404)
+                    case "alt":
+                        del dir[0]
+                        if os.path.splitext("/".join(dir))[1]:
+                            if os.path.isfile("alt/" + "/".join(dir)):
+                                return flask.send_from_directory("alt", "/".join(dir))
+                            else:
+                                return error(404)
+                        else:
+                            return get("alt/" + "/".join(dir) + "/index.html")
                     case _:
                         if os.path.splitext("/".join(dir))[1]:
                             if os.path.isfile("pages/" + "/".join(dir)):
