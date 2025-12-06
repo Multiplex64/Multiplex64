@@ -53,13 +53,17 @@ function __setInnerHTML(elm, html) {
 
 async function __goMainContent(loc) {
     // Needs support for relative paths
-    const response = await fetch("/_null/page/" + loc);
-    if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
+    if (/^(\/alt|\/_null)/.test(loc)) {
+        window.location.href = loc;
+    } else {
+        const response = await fetch("/_null/page/" + loc);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        val = await response.text();
+        __setInnerHTML(document.getElementById("__main"), val)
+        __load();
     }
-    val = await response.text();
-    __setInnerHTML(document.getElementById("__main"), val)
-    __load();
 }
 
 function __checkSearch() {
