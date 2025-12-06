@@ -53,17 +53,13 @@ function __setInnerHTML(elm, html) {
 
 async function __goMainContent(loc) {
     // Needs support for relative paths
-    if (/^(\/alt|\/_null)/.test(loc)) {
-        window.location.href = loc;
-    } else {
-        const response = await fetch("/_null/page/" + loc);
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-        val = await response.text();
-        __setInnerHTML(document.getElementById("__main"), val)
-        __load();
+    const response = await fetch("/_null/page/" + loc);
+    if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
     }
+    val = await response.text();
+    __setInnerHTML(document.getElementById("__main"), val)
+    __load();
 }
 
 function __checkSearch() {
@@ -91,8 +87,7 @@ function __toggleNav() {
 // Program Scripts
 
 async function _goto(loc) {
-    urlDetect = new RegExp('^(?:[a-z+]+:)?//', 'i');
-    if (urlDetect.test(loc)) {
+    if (/^(?:[a-z+]+:)?\/\//.test(loc) || /^(\/alt|\/_null)/.test(loc)) {
         userConfirm = confirm("You are leaving Multiplex64. Are you sure you want to proceed?");
         if (userConfirm) {
             window.location.href = loc;
