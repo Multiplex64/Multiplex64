@@ -12,14 +12,12 @@ function __load() {
     for (var i = 0; i < anchors.length; i++) {
         anchor = anchors[i]
         if (!anchor.classList.contains("__linkListenerApplied")) {
-            if (!/^(tel:|mailto:|sms:|javascript:)/.test(anchor.href)) {
-                anchor.classList.add("__linkListenerApplied")
-                anchor.addEventListener("click", function () {
-                    _goto(this.getAttribute("href"))
-                    // Deprecated, replacement needed
-                    event.preventDefault();
-                }, false);
-            }
+            anchor.classList.add("__linkListenerApplied")
+            anchor.addEventListener("click", function () {
+                _goto(this.getAttribute("href"))
+                // Deprecated, replacement needed
+                event.preventDefault();
+            }, false);
         }
     }
     ele = document.getElementById("__search")
@@ -87,7 +85,7 @@ function __toggleNav() {
 // Program Scripts
 
 async function _goto(loc) {
-    if (/^(?:[a-z+]+:)?\/\//.test(loc) || /^(\/alt|\/_null)/.test(loc)) {
+    if (/^(?:[a-z+]+:)?\/\/|^(tel:|mailto:|sms:|javascript:|\/alt|\/_null)/.test(loc)) {
         userConfirm = confirm("You are leaving Multiplex64. Are you sure you want to proceed?");
         if (userConfirm) {
             window.location.href = loc;
