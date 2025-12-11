@@ -22,8 +22,8 @@ def get(page: str):
 def error(e=500, msg=""):
     try:
         with (
-            open("global/http-response.json", "r") as file,
-            open("global/http-response.html", "r") as html,
+            open("system/http-response.json", "r") as file,
+            open("system/http-response.html", "r") as html,
         ):
             data = json.loads(file.read())[str(e)]
             return (
@@ -82,12 +82,14 @@ def main(path):
                         match dir[0]:
                             case "test":
                                 return "GET Test OK!", 200
-                            case "global":
+                            case "system":
                                 del dir[0]
+                                if not dir:
+                                    return error(404)
                                 if os.path.splitext("/".join(dir))[1]:
-                                    if os.path.isfile("global/" + "/".join(dir)):
+                                    if os.path.isfile("system/" + "/".join(dir)):
                                         return flask.send_from_directory(
-                                            "global", "/".join(dir)
+                                            "system", "/".join(dir)
                                         )
                                     else:
                                         return error(404)
@@ -101,6 +103,8 @@ def main(path):
                                     return error(404)
                             case "file":
                                 del dir[0]
+                                if not dir:
+                                    return error(404)
                                 if os.path.splitext("/".join(dir))[1]:
                                     if os.path.isfile("pages/" + "/".join(dir)):
                                         return flask.send_from_directory(
@@ -131,15 +135,13 @@ def main(path):
                                 pageContent = (pageContent, None)
                             return (
                                 replace(
-                                    get("global/index.html"),
+                                    get("system/index.html"),
                                     stylecontent=(
-                                        "<style>"
-                                        + get("global/style.css")
-                                        + "</style>"
+                                        "<style>" + get("system/style.css") + "</style>"
                                     ),
                                     scriptcontent=(
                                         "<script>"
-                                        + get("global/script.js")
+                                        + get("system/script.js")
                                         + "</script>"
                                     ),
                                     pagecontent=pageContent[0],
