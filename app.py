@@ -1,9 +1,12 @@
 import os
 import json
-import flask
 import git
+import flask
+
+# Git and Flask required
 
 
+# Insert content into template text
 def replace(inputText, **toInsert):
     text = inputText
     for key, value in toInsert.items():
@@ -11,6 +14,7 @@ def replace(inputText, **toInsert):
     return text
 
 
+# Read text file and return content
 def get(page: str):
     try:
         with open(page, "r") as file:
@@ -19,6 +23,7 @@ def get(page: str):
         return error(404)
 
 
+# Handle errors
 def error(e=500, msg=""):
     try:
         with (
