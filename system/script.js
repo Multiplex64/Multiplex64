@@ -83,8 +83,7 @@ function __toggleNav() {
 // Program Scripts
 
 async function _goto(loc) {
-    if (/^(javascript:)/.test(loc)) { }
-    else if (/^(?:[a-z+]+:)?\/\/|^(tel:|mailto:|sms:|\/alt|\/null)/.test(loc)) {
+    if (/(^(?!javascript:))(^(?:[a-z]+:)|^(\/null|\/alt))/.test(loc)) {
         userConfirm = confirm("You are leaving Multiplex64. Are you sure you want to proceed?");
         if (!userConfirm) {
             event.preventDefault();
