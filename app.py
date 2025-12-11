@@ -131,7 +131,17 @@ def main(path):
                                 pageContent = (pageContent, None)
                             return (
                                 replace(
-                                    get("global/_index.html"),
+                                    get("global/index.html"),
+                                    stylecontent=(
+                                        "<style>"
+                                        + get("global/style.css")
+                                        + "</style>"
+                                    ),
+                                    scriptcontent=(
+                                        "<script>"
+                                        + get("global/script.js")
+                                        + "</script>"
+                                    ),
                                     pagecontent=pageContent[0],
                                 ),
                                 pageContent[1],
