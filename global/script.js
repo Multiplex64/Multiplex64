@@ -15,8 +15,6 @@ function __load() {
             anchor.classList.add("__linkListenerApplied")
             anchor.addEventListener("click", function () {
                 _goto(this.getAttribute("href"))
-                // Deprecated, replacement needed
-                event.preventDefault();
             }, false);
         }
     }
@@ -51,7 +49,7 @@ function __setInnerHTML(elm, html) {
 
 async function __goMainContent(loc) {
     // Needs support for relative paths
-    const response = await fetch("/_null/page/" + loc);
+    const response = await fetch("/null/page/" + loc);
     if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
     }
@@ -85,10 +83,11 @@ function __toggleNav() {
 // Program Scripts
 
 async function _goto(loc) {
-    if (/^(?:[a-z+]+:)?\/\/|^(tel:|mailto:|sms:|javascript:|\/alt|\/_null)/.test(loc)) {
+    if (/^(javascript:)/.test(loc)) { }
+    else if (/^(?:[a-z+]+:)?\/\/|^(tel:|mailto:|sms:|\/alt|\/null)/.test(loc)) {
         userConfirm = confirm("You are leaving Multiplex64. Are you sure you want to proceed?");
-        if (userConfirm) {
-            window.location.href = loc;
+        if (!userConfirm) {
+            event.preventDefault();
         }
     } else {
         window.history.pushState({}, "", loc);
@@ -97,6 +96,8 @@ async function _goto(loc) {
         } catch (error) {
             console.error(error.message);
         }
+        // Deprecated, replacement needed
+        event.preventDefault();
     }
 }
 
