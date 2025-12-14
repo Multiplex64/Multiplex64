@@ -5,6 +5,12 @@ function __init() {
     window.addEventListener('popstate', function () {
         __goMainContent(window.location.pathname)
     }, false);
+    searchInput = document.getElementById('__search')
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            _goto("/search?q=" + encodeURIComponent(searchInput.value.trim()));
+        }
+    });
 }
 
 function __load() {
@@ -13,8 +19,9 @@ function __load() {
         anchor = anchors[i]
         if (!anchor.classList.contains("__linkListenerApplied")) {
             anchor.classList.add("__linkListenerApplied")
-            anchor.addEventListener("click", function () {
+            anchor.addEventListener("click", function (e) {
                 _goto(this.getAttribute("href"))
+                e.preventDefault()
             }, false);
         }
     }
@@ -58,18 +65,6 @@ async function __goMainContent(loc) {
     __load();
 }
 
-function __checkSearch() {
-    // Deprecated, replacement needed
-    if (event.key === "Enter") {
-        __search();
-    }
-}
-
-function __search() {
-    ele = document.getElementById("__search")
-    _goto("/search?q=" + encodeURIComponent(ele.value.trim()));
-}
-
 function __toggleNav() {
     if (__navBar == 1) {
         __navBar = 0;
@@ -85,8 +80,8 @@ function __toggleNav() {
 async function _goto(loc) {
     if (/(^(?!javascript:))(^(?:[a-z]+:)|^(\/null|\/alt))/.test(loc)) {
         userConfirm = confirm("You are leaving Multiplex64. Are you sure you want to proceed?");
-        if (!userConfirm) {
-            event.preventDefault();
+        if (userConfirm) {
+            window.location.href = loc
         }
     } else {
         window.history.pushState({}, "", loc);
@@ -96,7 +91,6 @@ async function _goto(loc) {
             console.error(error.message);
         }
         // Deprecated, replacement needed
-        event.preventDefault();
     }
 }
 
