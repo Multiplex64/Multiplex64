@@ -41,6 +41,31 @@ def error(e=500, msg=""):
             500,
         )
 
+# Handle user pages
+def mainPageHandler(dir):
+    pageContent = get("pages/" + "/".join(dir) + "/index.html")
+    if not isinstance(pageContent, tuple):
+        pageContent = (pageContent, None)
+    return (
+        replace(
+            get("system/index.html"),
+            stylecontent=(
+                "<style>" + get("system/style.css") + "</style>"
+            ),
+            scriptcontent=(
+                "<script>"
+                + get("system/script.js")
+                + "</script>"
+            ),
+            metacontent=(
+                "<title>"
+                + "Multiplex64"
+                + "</title>"
+            ),
+            pagecontent=pageContent[0],
+        ),
+        pageContent[1],
+    )
 
 app = flask.Flask(__name__)
 
@@ -135,24 +160,7 @@ def main(path):
                             else:
                                 return error(404)
                         else:
-                            pageContent = get("pages/" + "/".join(dir) + "/index.html")
-                            if not isinstance(pageContent, tuple):
-                                pageContent = (pageContent, None)
-                            return (
-                                replace(
-                                    get("system/index.html"),
-                                    stylecontent=(
-                                        "<style>" + get("system/style.css") + "</style>"
-                                    ),
-                                    scriptcontent=(
-                                        "<script>"
-                                        + get("system/script.js")
-                                        + "</script>"
-                                    ),
-                                    pagecontent=pageContent[0],
-                                ),
-                                pageContent[1],
-                            )
+                            return mainPageHandler(dir)
             case "POST":
                 match dir[0]:
                     case "null":
