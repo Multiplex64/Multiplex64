@@ -19,10 +19,12 @@ function __load() {
         anchor = anchors[i]
         if (!anchor.classList.contains("__linkListenerApplied")) {
             anchor.classList.add("__linkListenerApplied")
-            anchor.addEventListener("click", function (e) {
-                _goto(this.getAttribute("href"))
-                e.preventDefault()
-            }, false);
+            if (!(/^(javascript:)/.test(anchor.getAttribute("href")))) {
+                anchor.addEventListener("click", function (e) {
+                    _goto(this.getAttribute("href"))
+                    e.preventDefault()
+                }, false);
+            }
         }
     }
     ele = document.getElementById("__search")
@@ -80,7 +82,7 @@ function __toggleNav() {
 // Program Scripts
 
 async function _goto(loc) {
-    if (/(^(?!javascript:))(^(?:[a-z]+:)|^(\/null|\/alt))/.test(loc)) {
+    if (/^(?:[a-z]+:)|^(\/null|\/alt)/.test(loc)) {
         userConfirm = confirm("You are leaving Multiplex64. Are you sure you want to proceed?");
         if (userConfirm) {
             window.location.href = loc
