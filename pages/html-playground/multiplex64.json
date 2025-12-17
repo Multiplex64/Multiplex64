@@ -1,0 +1,8 @@
+{
+    "meta": {
+        "live": true,
+        "name": "HTML Playground",
+        "title": "HTML Playground",
+        "description": "An interactive HTML tester."
+    }
+}

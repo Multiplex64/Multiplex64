@@ -60,8 +60,10 @@ async function __goMainContent(loc) {
     if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
     }
-    val = await response.text();
-    __setInnerHTML(document.getElementById("__main"), val)
+    val = await response.json();
+    __setInnerHTML(document.getElementById("__main"), val.data.html)
+    document.title = val.meta.title
+    document.querySelector('meta[name="description"]').setAttribute("content", val.meta.description);
     __load();
 }
 
