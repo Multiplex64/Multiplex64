@@ -3,6 +3,7 @@
         "live": false,
         "name": "Page",
         "title":"Page - Multiplex64",
-        "description":"Mutliplex64 Web Tools - Page"
+        "description":"Mutliplex64 Web Tools - Page",
+        "canonical":"#"
     }
 }

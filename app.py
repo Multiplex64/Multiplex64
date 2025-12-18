@@ -1,11 +1,11 @@
 import os
 import json
-import werkzeug
 import git
+import werkzeug
 import flask
 
 
-# Git and Flask required
+# Git, Werkzeug and Flask required
 
 
 # Insert content into template text
@@ -57,18 +57,20 @@ def mainPageHandler(dir):
             jsonRawData = get("system/default.json")
     jsonData = json.loads(jsonRawData)
 
+    metaData = (
+        "<title>"
+        + jsonData["meta"]["title"]
+        + "</title><meta name='description' content='"
+        + jsonData["meta"]["description"]
+        + "'>"
+    )
+
     return (
         replace(
             get("system/index.html"),
             stylecontent=("<style>" + get("system/style.css") + "</style>"),
             scriptcontent=("<script>" + get("system/script.js") + "</script>"),
-            metacontent=(
-                "<title>"
-                + jsonData["meta"]["title"]
-                + "</title><meta name='description' content='"
-                + jsonData["meta"]["description"]
-                + "'>"
-            ),
+            metacontent=metaData,
             pagecontent=pageContent[0],
         ),
         pageContent[1],

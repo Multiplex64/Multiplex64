@@ -3,6 +3,7 @@
         "live": false,
         "name": "Error Page",
         "title":"Error",
-        "description":"An error was encountered while loading the page."
+        "description":"An error was encountered while loading the page.",
+        "canonical":"#"
     }
 }

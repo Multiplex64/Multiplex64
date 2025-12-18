@@ -3,7 +3,8 @@
 body,
 button,
 input,
-textarea {
+textarea,
+select {
     font-family: "Courier New", monospace;
     font-size: 16px;
 }
@@ -16,6 +17,7 @@ body {
 button,
 input,
 textarea,
+select,
 iframe {
     border-width: 1px;
     border-color: black;
@@ -23,8 +25,10 @@ iframe {
     border-style: solid;
 }
 
+button,
 input,
-textarea {
+textarea,
+select {
     &:focus {
         outline: solid #2080f0 2px;
         outline-offset: -2px;
