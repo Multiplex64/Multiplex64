@@ -152,6 +152,17 @@ main {
     padding: 4px;
 }
 
+#__skipContent {
+    font-size: 16px;
+    left: 0;
+    width: 256px;
+    z-index: -100;
+    text-decoration: underline;
+    &:focus{
+        z-index: 100;
+    }
+}
+
 #__homeButton {
     width: 224px;
     left: 32px;

@@ -193,6 +193,7 @@ def main(path):
                     case "test":
                         return {"response": "POST Test OK!"}, 200
                     case "server-update":
+                        # Update flask server using github webhooks
                         abort_code = 403
                         if "X-Github-Event" not in flask.request.headers:
                             flask.abort(abort_code)

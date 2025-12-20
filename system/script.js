@@ -1,5 +1,6 @@
 // System Scripts
 
+// Init site upon initial load
 function __init() {
     __navBar = 0;
     window.addEventListener('popstate', function () {
@@ -13,13 +14,14 @@ function __init() {
     });
 }
 
+// Script to be run every time new page is navigated to
 function __load() {
     anchors = document.querySelectorAll("a")
     for (var i = 0; i < anchors.length; i++) {
         anchor = anchors[i]
         if (!anchor.classList.contains("__linkListenerApplied")) {
             anchor.classList.add("__linkListenerApplied")
-            if (!(/^(javascript:)/.test(anchor.getAttribute("href")))) {
+            if (!(/^(#|javascript:)/.test(anchor.getAttribute("href")))) {
                 anchor.addEventListener("click", function (e) {
                     _goto(this.getAttribute("href"))
                     e.preventDefault()
@@ -42,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
     __load();
 });
 
+// Set innerHTML of an object and inject JS
 function __setInnerHTML(elm, html) {
     elm.innerHTML = html;
     Array.from(elm.querySelectorAll("script"))
@@ -56,6 +59,7 @@ function __setInnerHTML(elm, html) {
         });
 }
 
+// Navigate to a page without full reload
 async function __goMainContent(loc) {
     // Needs support for relative paths
     const response = await fetch("/null/page/" + loc);
@@ -69,6 +73,7 @@ async function __goMainContent(loc) {
     __load();
 }
 
+// Toggle Navbar
 function __toggleNav() {
     if (__navBar == 1) {
         __navBar = 0;
@@ -81,6 +86,7 @@ function __toggleNav() {
 
 // Program Scripts
 
+// Go to page
 async function _goto(loc) {
     if (/^(?:[a-z]+:)|^(\/null|\/alt)/.test(loc)) {
         userConfirm = confirm("You are leaving Multiplex64. Are you sure you want to proceed?");
@@ -95,37 +101,5 @@ async function _goto(loc) {
             console.error(error.message);
         }
         // Deprecated, replacement needed
-    }
-}
-
-async function _getData(url) {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-        const json = await response.json();
-        return json;
-    } catch (error) {
-        console.error(error.message);
-    }
-}
-
-async function _postData(url, data) {
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data),
-        });
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-        const json = await response.json();
-        return JSON.parse(json);
-    } catch (error) {
-        console.error(error.message);
     }
 }
