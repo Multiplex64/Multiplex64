@@ -117,7 +117,7 @@ button {
     border-right: solid 1px;
 }
 
-#__main {
+main {
     position: fixed;
     top: 32px;
     bottom: 0;
@@ -128,7 +128,7 @@ button {
     overflow-y: scroll;
 }
 
-.__navOpen #__main {
+.__navOpen main {
     left: 256px;
 }
 
@@ -177,7 +177,7 @@ button {
         width: 100%;
     }
 
-    .__navOpen #__main {
+    .__navOpen main {
         left: 0;
     }
 
