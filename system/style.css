@@ -48,7 +48,8 @@ iframe {
     box-sizing: border-box;
 }
 
-button {
+button,
+.__topButton {
     background-color: #f0f0f0;
 
     &:hover {

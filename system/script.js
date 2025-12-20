@@ -2,7 +2,7 @@
 
 // Init site upon initial load
 function __init() {
-    __navBar = 0;
+    __navBar = document.body.classList.contains("__navOpen");
     window.addEventListener('popstate', function () {
         __goMainContent(window.location.pathname)
     }, false);
@@ -72,11 +72,11 @@ async function __goMainContent(loc) {
 
 // Toggle Navbar
 function __toggleNav() {
-    if (__navBar == 1) {
-        __navBar = 0;
+    if (__navBar == true) {
+        __navBar = false;
         document.body.classList.remove("__navOpen");
     } else {
-        __navBar = 1;
+        __navBar = true;
         document.body.classList.add("__navOpen");
     }
 }
