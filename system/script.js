@@ -96,6 +96,8 @@ async function _goto(loc) {
         } catch (error) {
             console.error(error.message);
         }
-        window.history.pushState({}, "", loc);
+        if (window.location.href !== new URL(loc, window.location.href).href) {
+            window.history.pushState({}, "", loc);
+        }
     }
 }
