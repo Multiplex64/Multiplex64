@@ -61,11 +61,8 @@ function __setInnerHTML(elm, html) {
 
 // Navigate to a page without full reload
 async function __goMainContent(loc) {
-    // Needs support for relative paths
-    const response = await fetch("/null/page/" + loc);
-    if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
-    }
+    targetURL = new URL(loc, window.location.href)
+    const response = await fetch("/null/page" + targetURL.pathname);
     val = await response.json();
     __setInnerHTML(document.querySelector("main"), val.data.html)
     document.title = val.meta.title
@@ -94,12 +91,11 @@ async function _goto(loc) {
             window.location.href = loc
         }
     } else {
-        window.history.pushState({}, "", loc);
         try {
             __goMainContent(loc)
         } catch (error) {
             console.error(error.message);
         }
-        // Deprecated, replacement needed
+        window.history.pushState({}, "", loc);
     }
 }
