@@ -34,7 +34,13 @@ def error(e=500, msg=""):
         ):
             data = json.loads(file.read())[str(e)]
             return (
-                replace(html.read(), error=str(e), errorinfo=data, errormessage=msg),
+                replace(
+                    html.read(),
+                    error=str(e),
+                    errorinfo=data["message"],
+                    errormessage=msg,
+                    errordescription=data["description"],
+                ),
                 str(e),
             )
     except Exception:
