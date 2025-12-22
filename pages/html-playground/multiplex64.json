@@ -3,6 +3,7 @@
         "live": true,
         "name": "HTML Playground",
         "title": "HTML Playground",
-        "description": "An interactive HTML tester."
+        "description": "An interactive HTML tester.",
+        "canonical":"/html-playground/"
     }
 }

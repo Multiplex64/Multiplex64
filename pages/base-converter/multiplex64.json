@@ -3,6 +3,7 @@
         "live": true,
         "name": "Base Converter",
         "title": "Base Converter",
-        "description": "A tool to convert numbers of different bases or radix."
+        "description": "A tool to convert numbers of different bases or radix.",
+        "canonical":"/base-converter/"
     }
 }

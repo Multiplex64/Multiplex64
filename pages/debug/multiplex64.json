@@ -3,6 +3,7 @@
         "live": true,
         "name": "Multiplex64 Debug",
         "title": "Debug",
-        "description": "Tips to debug our site."
+        "description": "Tips to debug our site.",
+        "canonical":"/debug/"
     }
 }

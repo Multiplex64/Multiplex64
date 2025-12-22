@@ -3,6 +3,7 @@
         "live": true,
         "name": "Search",
         "title": "Search",
-        "description": "Search Multiplex64"
+        "description": "Search Multiplex64",
+        "canonical":"/search/"
     }
 }

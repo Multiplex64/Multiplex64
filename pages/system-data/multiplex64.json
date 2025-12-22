@@ -3,6 +3,7 @@
         "live": true,
         "name": "System Data",
         "title": "System Data",
-        "description": "Information about your device."
+        "description": "Information about your device.",
+        "canonical":"/system-data/"
     }
 }

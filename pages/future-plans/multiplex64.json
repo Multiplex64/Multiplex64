@@ -3,6 +3,7 @@
         "live": true,
         "name": "Future Plans",
         "title": "Future Plans",
-        "description": "Future plans for this site."
+        "description": "Future plans for this site.",
+        "canonical":"/future-plans/"
     }
 }

@@ -4,7 +4,6 @@
         "name": "Error Page",
         "title": "Error",
         "description": "An error was encountered while loading the page.",
-        "canonical": "#",
         "noindex": true
     }
 }

@@ -9,7 +9,7 @@ function __init() {
     searchInput = document.getElementById('__search')
     searchInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-            _goto("/search?q=" + encodeURIComponent(searchInput.value.trim()));
+            _goto("/search/?q=" + encodeURIComponent(searchInput.value.trim()));
         }
     });
 }

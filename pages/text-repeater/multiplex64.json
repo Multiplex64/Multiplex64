@@ -3,6 +3,7 @@
         "live": true,
         "name": "Test Repeater",
         "title": "Text Repeater",
-        "description": "A simple text repeater."
+        "description": "A simple text repeater.",
+        "canonical":"/text-repeater/"
     }
 }
