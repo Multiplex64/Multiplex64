@@ -99,6 +99,33 @@ def smartPageHandler(dir):
     return jsonData, pageContent[1]
 
 
+# Update the Pythonanywhere server using Github Webhooks
+def updateServer():
+    abort_code = 403
+    if "X-Github-Event" not in flask.request.headers:
+        flask.abort(abort_code)
+    if "X-Github-Delivery" not in flask.request.headers:
+        flask.abort(abort_code)
+
+    if not flask.request.is_json:
+        flask.abort(abort_code)
+    if "User-Agent" not in flask.request.headers:
+        flask.abort(abort_code)
+    ua = flask.request.headers.get("User-Agent")
+    if not ua.startswith("GitHub-Hookshot/"):
+        flask.abort(abort_code)
+
+    event = flask.request.headers.get("X-GitHub-Event")
+    if event == "ping":
+        return json.dumps({"Response": "Ping OK!"})
+    if event != "push":
+        return json.dumps({"Response": "Wrong event type"})
+
+    repo = git.cmd.Git("https://github.com/Multiplex64/Multiplex64/")
+    repo.pull("origin", "main")
+    return "Updated PythonAnywhere successfully", 200
+
+
 app = flask.Flask(__name__)
 
 
@@ -199,32 +226,7 @@ def main(path):
                     case "test":
                         return {"response": "POST Test OK!"}, 200
                     case "server-update":
-                        # Update flask server using github webhooks
-                        abort_code = 403
-                        if "X-Github-Event" not in flask.request.headers:
-                            flask.abort(abort_code)
-                        if "X-Github-Delivery" not in flask.request.headers:
-                            flask.abort(abort_code)
-
-                        if not flask.request.is_json:
-                            flask.abort(abort_code)
-                        if "User-Agent" not in flask.request.headers:
-                            flask.abort(abort_code)
-                        ua = flask.request.headers.get("User-Agent")
-                        if not ua.startswith("GitHub-Hookshot/"):
-                            flask.abort(abort_code)
-
-                        event = flask.request.headers.get("X-GitHub-Event")
-                        if event == "ping":
-                            return json.dumps({"Response": "Ping OK!"})
-                        if event != "push":
-                            return json.dumps({"Response": "Wrong event type"})
-
-                        repo = git.cmd.Git(
-                            "https://github.com/Multiplex64/Multiplex64/"
-                        )
-                        repo.pull("origin", "main")
-                        return "Updated PythonAnywhere successfully", 200
+                        return updateServer()
                     case _:
                         flask.abort(404)
             case _:
