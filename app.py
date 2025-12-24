@@ -68,6 +68,8 @@ def mainPageHandler(dir):
         + jsonData["meta"]["title"]
         + "</title><meta name='description' content='"
         + jsonData["meta"]["description"]
+        + "'><link rel='canonical' href='"
+        + jsonData["meta"]["canonical"]
         + "'>"
     )
 

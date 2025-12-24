@@ -66,7 +66,10 @@ async function __goMainContent(loc) {
     val = await response.json();
     __setInnerHTML(document.querySelector("main"), val.data.html)
     document.title = val.meta.title
-    document.querySelector('meta[name="description"]').setAttribute("content", val.meta.description);
+    if (val.meta.description) {
+        document.querySelector('meta[name="description"]').setAttribute("content", val.meta.description);
+    }
+    document.querySelector('link[rel="canonical"]').setAttribute("href", val.meta.canonical);
     __load();
 }
 
