@@ -69,7 +69,9 @@ async function __goMainContent(loc) {
     if (val.meta.description) {
         document.querySelector('meta[name="description"]').setAttribute("content", val.meta.description);
     }
-    document.querySelector('link[rel="canonical"]').setAttribute("href", val.meta.canonical);
+    if (val.meta.canonical) {
+        document.querySelector('link[rel="canonical"]').setAttribute("href", val.meta.canonical);
+    }
     __load();
 }
 
