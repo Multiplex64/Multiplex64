@@ -1,5 +1,7 @@
 import os
 import json
+import time
+import datetime
 import git
 import werkzeug
 import flask
@@ -23,6 +25,15 @@ def get(page: str):
             return file.read()
     except Exception:
         return error(404)
+
+
+# Append data to a JSON log
+def appendLog(filePath, toAppend):
+    try:
+        with open(filePath, "a") as file:
+            file.write("\n" + toAppend)
+    except Exception as e:
+        print(e)
 
 
 # Handle errors
@@ -85,6 +96,7 @@ def mainPageHandler(dir):
     )
 
 
+# Send page data to user to load a page without full refresh
 def smartPageHandler(dir):
     pageContent = get("pages/" + "/".join(dir) + "/index.html")
     jsonRawData = get("pages/" + "/".join(dir) + "/multiplex64.json")
@@ -131,9 +143,54 @@ def updateServer():
 app = flask.Flask(__name__)
 
 
+# Apply custom error handling
 @app.errorhandler(werkzeug.exceptions.HTTPException)
 def handleError(e):
     return error(e.code)
+
+
+@app.before_request
+def before_request():
+    flask.g.startDatetime = datetime.datetime.now(datetime.timezone.utc)
+    flask.g.startTime = time.time()
+
+
+# Log responses
+@app.after_request
+def afterRequest(response):
+    appendLog(
+        "database/http-log-machine-readable.txt",
+        json.dumps(
+            {
+                "info": {
+                    "request-time-utc": flask.g.startTime,
+                    "response-time-ms": 1000 * (time.time() - flask.g.startTime),
+                },
+                "response": {
+                    "status_code": response.status_code,
+                },
+                "request": {
+                    "method": flask.request.method,
+                    "path": flask.request.path,
+                    "remote_addr": flask.request.remote_addr,
+                    "user_agent": flask.request.user_agent.string,
+                    "referrer": flask.request.referrer,
+                },
+            }
+        ),
+    )
+    appendLog(
+        "database/http-log-human-readable.txt",
+        str(flask.g.startDatetime)
+        + " - "
+        + flask.request.remote_addr.ljust(15)
+        + " - "
+        + flask.request.method.ljust(8)
+        + flask.request.path
+        + " - "
+        + str(response.status_code),
+    )
+    return response
 
 
 @app.route(
