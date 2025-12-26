@@ -158,6 +158,11 @@ def before_request():
 # Log responses
 @app.after_request
 def afterRequest(response):
+    if flask.request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+        remote_addr = flask.request.environ['REMOTE_ADDR']
+    else:
+        remote_addr = flask.request.environ['HTTP_X_FORWARDED_FOR']
+    
     appendLog(
         "database/http-log-machine-readable.txt",
         json.dumps(
@@ -172,7 +177,7 @@ def afterRequest(response):
                 "request": {
                     "method": flask.request.method,
                     "path": flask.request.path,
-                    "remote_addr": flask.request.remote_addr,
+                    "remote_addr": remote_addr,
                     "user_agent": flask.request.user_agent.string,
                     "referrer": flask.request.referrer,
                 },
@@ -183,7 +188,7 @@ def afterRequest(response):
         "database/http-log-human-readable.txt",
         str(flask.g.startDatetime)
         + " - "
-        + flask.request.remote_addr.ljust(15)
+        + remote_addr.ljust(15)
         + " - "
         + flask.request.method.ljust(8)
         + flask.request.path
