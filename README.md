@@ -1,4 +1,4 @@
-Multiplex64 is a personal project which aims to create a small web tools site.
+Multiplex64 is a small web tools site.
 It's created with Python and Flask, and run via Pythonanywhere.
 
 Site located at:
