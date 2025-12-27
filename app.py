@@ -1,9 +1,8 @@
-import os
 import json
 import time
 import datetime
+import typing
 import git
-import werkzeug
 import flask
 
 
@@ -11,13 +10,160 @@ import flask
 
 
 # Insert content into template text
-def replace(inputText: str, **toInsert: dict[str, str]):
+def replace(inputText: str, toInsert: dict[str, str]) -> str:
     text = inputText
     for key, value in toInsert.items():
         text = text.replace("{{" + key + "}}", str(value))
     return text
 
 
+# Read text file and return content
+def get(page: str):
+    try:
+        with open(page, "r") as file:
+            flask.g.lastGet = 200
+            return file.read()
+    except Exception:
+        flask.g.lastGet = 404
+        return error(404)
+
+
+# Append data to a log
+def appendLog(filePath: str, toAppend: str):
+    try:
+        with open(filePath, "a") as file:
+            file.write("\n" + toAppend)
+    except Exception as e:
+        print(e)
+
+
+def getPage(path: str) -> str:
+    try:
+        with open(path, "r") as file:
+            return file.read()
+    except Exception:
+        return error(404)
+
+
+# Generate error page
+def error(e: int = 500, msg: str = "") -> str:
+    try:
+        with (
+            open("system/http-response.json", "r") as file,
+            open("system/http-response.html", "r") as html,
+        ):
+            data = json.loads(file.read())[str(e)]
+            flask.g.lastGet = e
+            return replace(
+                html.read(),
+                {
+                    "error": str(e),
+                    "errorinfo": data["message"],
+                    "errormessage": msg,
+                    "errordescription": data["description"],
+                },
+            )
+    except Exception:
+        flask.g.lastGet = 500
+        return "500 Internal Server Error - Critical Failure of Error Handling System."
+
+
+app = flask.Flask(__name__)
+
+
+@app.before_request
+def before_request():
+    flask.g.lastGet = 404
+    flask.g.startDatetime = datetime.datetime.now(datetime.timezone.utc)
+    flask.g.startTime = time.time()
+
+
+@app.after_request
+def afterRequest(response: flask.Response) -> flask.Response:
+    return response
+
+
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def main(path: str) -> tuple[str,int]:
+    pageContent = get("pages/" + path + "/index.html")
+    statusCode = flask.g.lastGet
+    jsonRawData = get("pages/" + path + "/multiplex64.json")
+
+    if statusCode != 200:
+        jsonRawData = get("system/error.json")
+    else:
+        if flask.g.lastGet != 200:
+            jsonRawData = get("system/default.json")
+    jsonData = json.loads(jsonRawData)
+
+    metaData = (
+        "<title>"
+        + jsonData["meta"]["title"]
+        + "</title><meta name='description' content='"
+        + jsonData["meta"]["description"]
+        + "'><link rel='canonical' href='"
+        + jsonData["meta"]["canonical"]
+        + "'>"
+    )
+
+    return replace(
+        get("system/index.html"),
+        {
+            "stylecontent": ("<style>" + get("system/style.css") + "</style>"),
+            "scriptcontent": ("<script>" + get("system/script.js") + "</script>"),
+            "metacontent": metaData,
+            "pagecontent": pageContent,
+        },
+    ), statusCode
+
+
+@app.route("/null/page/", defaults={"path": ""})
+@app.route("/null/page/<path:path>")
+def null_page(path: str) ->  tuple[typing.Any,int]:
+    pageContent = get("pages/" + path + "/index.html")
+    statusCode = flask.g.lastGet
+    jsonRawData = get("pages/" + path + "/multiplex64.json")
+
+    if statusCode != 200:
+        jsonRawData = get("system/error.json")
+    else:
+        if flask.g.lastGet != 200:
+            jsonRawData = get("system/default.json")
+    jsonData = json.loads(jsonRawData)
+    jsonData["data"] = {}
+    jsonData["data"]["html"] = pageContent
+    return jsonData, statusCode
+
+
+@app.route("/null/server-update/", methods=["POST"])
+def updateServer():
+    abort_code = 403
+    if "X-Github-Event" not in flask.request.headers:
+        flask.abort(abort_code)
+    if "X-Github-Delivery" not in flask.request.headers:
+        flask.abort(abort_code)
+
+    if not flask.request.is_json:
+        flask.abort(abort_code)
+    if "User-Agent" not in flask.request.headers:
+        flask.abort(abort_code)
+    ua = flask.request.headers.get("User-Agent")
+    if ua and not ua.startswith("GitHub-Hookshot/"):
+        flask.abort(abort_code)
+
+    event = flask.request.headers.get("X-GitHub-Event")
+    if event == "ping":
+        return json.dumps({"Response": "Ping OK!"})
+    if event != "push":
+        return json.dumps({"Response": "Wrong event type"})
+
+    repo = git.cmd.Git("https://github.com/Multiplex64/Multiplex64/")  # type: ignore
+    repo.pull("origin", "main")  # type: ignore
+    return "Updated PythonAnywhere successfully", 200
+
+
+"""
 # Read text file and return content
 def get(page: str):
     try:
@@ -297,3 +443,4 @@ def main(path):
                 flask.abort(404)
     else:
         flask.abort(405)
+"""
