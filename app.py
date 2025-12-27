@@ -11,7 +11,7 @@ import flask
 
 
 # Insert content into template text
-def replace(inputText, **toInsert):
+def replace(inputText: str, **toInsert: dict[str, str]):
     text = inputText
     for key, value in toInsert.items():
         text = text.replace("{{" + key + "}}", str(value))
@@ -28,7 +28,7 @@ def get(page: str):
 
 
 # Append data to a JSON log
-def appendLog(filePath, toAppend):
+def appendLog(filePath:str, toAppend:str):
     try:
         with open(filePath, "a") as file:
             file.write("\n" + toAppend)
@@ -37,7 +37,7 @@ def appendLog(filePath, toAppend):
 
 
 # Handle errors
-def error(e=500, msg=""):
+def error(e:int=500, msg:str=""):
     try:
         with (
             open("system/http-response.json", "r") as file,
@@ -158,11 +158,11 @@ def before_request():
 # Log responses
 @app.after_request
 def afterRequest(response):
-    if flask.request.environ.get('HTTP_X_FORWARDED_FOR') is None:
-        remote_addr = flask.request.environ['REMOTE_ADDR']
+    if flask.request.environ.get("HTTP_X_FORWARDED_FOR") is None:
+        remote_addr = flask.request.environ["REMOTE_ADDR"]
     else:
-        remote_addr = flask.request.environ['HTTP_X_FORWARDED_FOR']
-    
+        remote_addr = flask.request.environ["HTTP_X_FORWARDED_FOR"]
+
     appendLog(
         "database/http-log-machine-readable.txt",
         json.dumps(
