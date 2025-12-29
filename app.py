@@ -11,19 +11,33 @@ import flask
 # Git, Werkzeug and Flask Required!
 
 
+# List of All HTTP Methods
+methods = [
+    "GET",
+    "HEAD",
+    "POST",
+    "PUT",
+    "DELETE",
+    "CONNECT",
+    "OPTIONS",
+    "TRACE",
+    "PATCH",
+]
+
+
 # Insert Content into Template Text
-def replace(inputText: str, toInsert: dict[str, str]) -> str:
-    text = inputText
-    for key, value in toInsert.items():
+def replace(input_text: str, to_insert: dict[str, str]) -> str:
+    text = input_text
+    for key, value in to_insert.items():
         text = text.replace("{{" + key + "}}", str(value))
     return text
 
 
 # Append Data to a Log
-def appendLog(filePath: str, toAppend: str) -> None:
+def append_log(file_path: str, to_append: str) -> None:
     try:
-        with open(filePath, "a") as file:
-            file.write("\n" + toAppend)
+        with open(file_path, "a") as file:
+            file.write("\n" + to_append)
     except Exception as e:
         print(e)
 
@@ -32,14 +46,14 @@ def appendLog(filePath: str, toAppend: str) -> None:
 def get(page: str) -> str:
     try:
         with open(page, "r") as file:
-            flask.g.lastGet = 200
+            flask.g.last_get = 200
             return file.read()
     except Exception:
-        flask.g.lastGet = 404
+        flask.g.last_get = 404
         return respond(404)
 
 
-# Wrap an HTML fragment page with outer tags and style
+# Wrap an HTML Fragment Page with Outer Tags
 def wrap(content: str) -> str:
     try:
         with open("system/wrapper.html", "r") as file:
@@ -54,7 +68,7 @@ def wrap(content: str) -> str:
         return respond(500, "Error While Generating Page")
 
 
-# Generate a generic HTTP response page
+# Generate a Generic HTTP Response Page
 def respond(e: int = 500, msg: str = "") -> str:
     try:
         with (
@@ -62,7 +76,7 @@ def respond(e: int = 500, msg: str = "") -> str:
             open("system/http-response.html", "r") as html,
         ):
             data = json.loads(file.read())[str(e)]
-            flask.g.lastGet = e
+            flask.g.last_get = e
             return replace(
                 html.read(),
                 {
@@ -73,7 +87,7 @@ def respond(e: int = 500, msg: str = "") -> str:
                 },
             )
     except Exception:
-        flask.g.lastGet = 500
+        flask.g.last_get = 500
         return "500 Internal Server Error - Critical Failure of Error Handling System."
 
 
@@ -82,9 +96,9 @@ app = flask.Flask(__name__)
 
 @app.before_request
 def before_request() -> None:
-    flask.g.lastGet = 404
-    flask.g.startDatetime = datetime.datetime.now(datetime.timezone.utc)
-    flask.g.startTime = time.time()
+    flask.g.last_get = 404
+    flask.g.start_datetime = datetime.datetime.now(datetime.timezone.utc)
+    flask.g.start_time = time.time()
 
 
 @app.after_request
@@ -95,13 +109,13 @@ def after_request(response: flask.Response) -> flask.Response:
         else:
             remote_addr = flask.request.environ["HTTP_X_FORWARDED_FOR"]
 
-        appendLog(
+        append_log(
             "database/http-log-machine-readable.txt",
             json.dumps(
                 {
                     "info": {
-                        "request-time-utc": flask.g.startTime,
-                        "response-time-ms": 1000 * (time.time() - flask.g.startTime),
+                        "request-time-utc": flask.g.start_time,
+                        "response-time-ms": 1000 * (time.time() - flask.g.start_time),
                     },
                     "response": {
                         "status_code": response.status_code,
@@ -116,9 +130,9 @@ def after_request(response: flask.Response) -> flask.Response:
                 }
             ),
         )
-        appendLog(
+        append_log(
             "database/http-log-human-readable.txt",
-            str(flask.g.startDatetime)
+            str(flask.g.start_datetime)
             + " - "
             + remote_addr.ljust(15)
             + " - "
@@ -132,31 +146,31 @@ def after_request(response: flask.Response) -> flask.Response:
     return response
 
 
-# Main page handler
+# Main Page Handler
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def main(path: str) -> flask.Response:
     if os.path.isfile("pages/" + path):
         return flask.send_from_directory("pages", path)
     else:
-        pageContent = get("pages/" + path + "/index.html")
-        statusCode = flask.g.lastGet
-        jsonRawData = get("pages/" + path + "/multiplex64.json")
+        page_content = get("pages/" + path + "/index.html")
+        status_code = flask.g.last_get
+        raw_json = get("pages/" + path + "/multiplex64.json")
 
-        if statusCode != 200:
-            jsonRawData = get("system/error.json")
+        if status_code != 200:
+            raw_json = get("system/error.json")
         else:
-            if flask.g.lastGet != 200:
-                jsonRawData = get("system/default.json")
-        jsonData = json.loads(jsonRawData)
+            if flask.g.last_get != 200:
+                raw_json = get("system/default.json")
+        json_dict = json.loads(raw_json)
 
         metaData = (
             "<title>"
-            + jsonData["meta"]["title"]
+            + json_dict["meta"]["title"]
             + "</title><meta name='description' content='"
-            + jsonData["meta"]["description"]
+            + json_dict["meta"]["description"]
             + "'><link rel='canonical' href='"
-            + jsonData["meta"]["canonical"]
+            + json_dict["meta"]["canonical"]
             + "'>"
         )
         response = flask.make_response(
@@ -168,10 +182,10 @@ def main(path: str) -> flask.Response:
                         "<script>" + get("system/script.js") + "</script>"
                     ),
                     "metacontent": metaData,
-                    "pagecontent": pageContent,
+                    "pagecontent": page_content,
                 },
             ),
-            statusCode,
+            status_code,
         )
         return response
 
@@ -182,9 +196,9 @@ def alt(path: str):
     if os.path.isfile("alt/" + path):
         return flask.send_from_directory("alt", path)
     else:
-        pageContent = get("alt/" + path + "/index.html")
-        statusCode = flask.g.lastGet
-        return flask.make_response(pageContent, statusCode)
+        page_content = get("alt/" + path + "/index.html")
+        status_code = flask.g.last_get
+        return flask.make_response(page_content, status_code)
 
 
 # Catch Unused /null Directories
@@ -196,25 +210,31 @@ def null(path: str) -> tuple[str, int]:
     )
 
 
-# Allow javascript Fetch to get page content without full reload
+@app.route("/null/test/", methods=methods)
+def null_test():
+    return flask.request.method + " Test OK!"
+
+
+# Allow Javascript Fetch to Get Page Content Without Full Site Reload
 @app.route("/null/page/", defaults={"path": ""})
 @app.route("/null/page/<path:path>")
 def null_page(path: str) -> tuple[typing.Any, int]:
-    pageContent = get("pages/" + path + "/index.html")
-    statusCode = flask.g.lastGet
-    jsonRawData = get("pages/" + path + "/multiplex64.json")
+    page_content = get("pages/" + path + "/index.html")
+    status_code = flask.g.last_get
+    raw_json = get("pages/" + path + "/multiplex64.json")
 
-    if statusCode != 200:
-        jsonRawData = get("system/error.json")
+    if status_code != 200:
+        raw_json = get("system/error.json")
     else:
-        if flask.g.lastGet != 200:
-            jsonRawData = get("system/default.json")
-    jsonData = json.loads(jsonRawData)
-    jsonData["data"] = {}
-    jsonData["data"]["html"] = pageContent
-    return jsonData, statusCode
+        if flask.g.last_get != 200:
+            raw_json = get("system/default.json")
+    json_dict = json.loads(raw_json)
+    json_dict["data"] = {}
+    json_dict["data"]["html"] = page_content
+    return json_dict, status_code
 
 
+# Update Server Using Github Webhooks
 @app.route("/null/server-update/", methods=["POST"])
 def update_server():
     abort_code = 403
@@ -242,7 +262,7 @@ def update_server():
     return "Updated PythonAnywhere successfully", 200
 
 
-# Catch all errors
+# Catch All Unhandled Errors
 @app.errorhandler(Exception)
 def handle_exception(e: Exception):
     return respond(500, "Unknown Internal Failure"), 500
@@ -251,9 +271,9 @@ def handle_exception(e: Exception):
 # Catch HTTP errors
 @app.errorhandler(werkzeug.exceptions.HTTPException)
 def handle_respond(e: werkzeug.exceptions.HTTPException) -> tuple[str, int]:
-    errorCode = e.code
+    error_code = e.code
     message = ""
-    if errorCode is None:
-        errorCode = 500
+    if error_code is None:
+        error_code = 500
         message = "Unexpected Error State in Werkzeug"
-    return wrap(respond(errorCode, message)), errorCode
+    return wrap(respond(error_code, message)), error_code
