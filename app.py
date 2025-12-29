@@ -36,11 +36,11 @@ def get(page: str) -> str:
             return file.read()
     except Exception:
         flask.g.lastGet = 404
-        return http_response(404)
+        return respond(404)
 
 
 # Wrap an HTML fragment page with outer tags and style
-def html_wrap(content: str) -> str:
+def wrap(content: str) -> str:
     try:
         with open("system/wrapper.html", "r") as file:
             return replace(
@@ -51,12 +51,11 @@ def html_wrap(content: str) -> str:
                 },
             )
     except Exception:
-        flask.g.lastGet = 404
-        return http_response(404)
+        return respond(500, "Error While Generating Page")
 
 
 # Generate a generic HTTP response page
-def http_response(e: int = 500, msg: str = "") -> str:
+def respond(e: int = 500, msg: str = "") -> str:
     try:
         with (
             open("system/http-response.json", "r") as file,
@@ -177,14 +176,22 @@ def main(path: str) -> flask.Response:
         return response
 
 
+# /alt Directory Handler
+@app.route("/alt/<path:path>")
+def alt(path: str):
+    if os.path.isfile("alt/" + path):
+        return flask.send_from_directory("alt", path)
+    else:
+        pageContent = get("alt/" + path + "/index.html")
+        statusCode = flask.g.lastGet
+        return flask.make_response(pageContent, statusCode)
+
+
+# Catch Unused /null Directories
 @app.route("/null/<path:path>")
 def null(path: str) -> tuple[str, int]:
     return (
-        html_wrap(
-            http_response(
-                404, "File/Directory Not Found - Requested Path: /null/" + path
-            )
-        ),
+        wrap(respond(404, "File/Directory Not Found - Requested Path: /null/" + path)),
         404,
     )
 
@@ -206,12 +213,6 @@ def null_page(path: str) -> tuple[typing.Any, int]:
     jsonData["data"] = {}
     jsonData["data"]["html"] = pageContent
     return jsonData, statusCode
-
-
-# Allow Access to System/ folder
-@app.route("/null/system/<path:path>")
-def null_system(path: str) -> flask.Response:
-    return flask.send_from_directory("system", path)
 
 
 @app.route("/null/server-update/", methods=["POST"])
@@ -241,20 +242,18 @@ def update_server():
     return "Updated PythonAnywhere successfully", 200
 
 
-"""
 # Catch all errors
 @app.errorhandler(Exception)
 def handle_exception(e: Exception):
-    return http_response(500, "Unknown failure"), 500
-"""
+    return respond(500, "Unknown Internal Failure"), 500
 
 
 # Catch HTTP errors
 @app.errorhandler(werkzeug.exceptions.HTTPException)
-def handle_http_response(e: werkzeug.exceptions.HTTPException) -> tuple[str, int]:
+def handle_respond(e: werkzeug.exceptions.HTTPException) -> tuple[str, int]:
     errorCode = e.code
     message = ""
     if errorCode is None:
         errorCode = 500
-        message = "Unexpected error state in werkzeug"
-    return html_wrap(http_response(errorCode, message)), errorCode
+        message = "Unexpected Error State in Werkzeug"
+    return wrap(respond(errorCode, message)), errorCode
