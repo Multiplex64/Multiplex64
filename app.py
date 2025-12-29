@@ -3,13 +3,14 @@ import time
 import datetime
 import typing
 import git
+import werkzeug.exceptions
 import flask
 
 
-# Git, Werkzeug and Flask required
+# Git, Werkzeug and Flask Required!
 
 
-# Insert content into template text
+# Insert Content into Template Text
 def replace(inputText: str, toInsert: dict[str, str]) -> str:
     text = inputText
     for key, value in toInsert.items():
@@ -17,19 +18,8 @@ def replace(inputText: str, toInsert: dict[str, str]) -> str:
     return text
 
 
-# Read text file and return content
-def get(page: str):
-    try:
-        with open(page, "r") as file:
-            flask.g.lastGet = 200
-            return file.read()
-    except Exception:
-        flask.g.lastGet = 404
-        return error(404)
-
-
-# Append data to a log
-def appendLog(filePath: str, toAppend: str):
+# Append Data to a Log
+def appendLog(filePath: str, toAppend: str) -> None:
     try:
         with open(filePath, "a") as file:
             file.write("\n" + toAppend)
@@ -37,16 +27,35 @@ def appendLog(filePath: str, toAppend: str):
         print(e)
 
 
-def getPage(path: str) -> str:
+# Read Text File and Return Content, Return a 404 page if Not Found
+def get(page: str) -> str:
     try:
-        with open(path, "r") as file:
+        with open(page, "r") as file:
+            flask.g.lastGet = 200
             return file.read()
     except Exception:
-        return error(404)
+        flask.g.lastGet = 404
+        return http_response(404)
 
 
-# Generate error page
-def error(e: int = 500, msg: str = "") -> str:
+# Wrap an HTML fragment page with outer tags and style
+def html_wrap(content: str) -> str:
+    try:
+        with open("system/wrapper.html", "r") as file:
+            return replace(
+                file.read(),
+                {
+                    "stylecontent": ("<style>" + get("system/style.css") + "</style>"),
+                    "content": content,
+                },
+            )
+    except Exception:
+        flask.g.lastGet = 404
+        return http_response(404)
+
+
+# Generate a generic HTTP response page
+def http_response(e: int = 500, msg: str = "") -> str:
     try:
         with (
             open("system/http-response.json", "r") as file,
@@ -72,20 +81,61 @@ app = flask.Flask(__name__)
 
 
 @app.before_request
-def before_request():
+def before_request() -> None:
     flask.g.lastGet = 404
     flask.g.startDatetime = datetime.datetime.now(datetime.timezone.utc)
     flask.g.startTime = time.time()
 
 
 @app.after_request
-def afterRequest(response: flask.Response) -> flask.Response:
+def after_request(response: flask.Response) -> flask.Response:
+    try:
+        if flask.request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+            remote_addr = flask.request.environ['REMOTE_ADDR']
+        else:
+            remote_addr = flask.request.environ['HTTP_X_FORWARDED_FOR']
+        
+        appendLog(
+            "database/http-log-machine-readable.txt",
+            json.dumps(
+                {
+                    "info": {
+                        "request-time-utc": flask.g.startTime,
+                        "response-time-ms": 1000 * (time.time() - flask.g.startTime),
+                    },
+                    "response": {
+                        "status_code": response.status_code,
+                    },
+                    "request": {
+                        "method": flask.request.method,
+                        "path": flask.request.path,
+                        "remote_addr": remote_addr,
+                        "user_agent": flask.request.user_agent.string,
+                        "referrer": flask.request.referrer,
+                    },
+                }
+            ),
+        )
+        appendLog(
+            "database/http-log-human-readable.txt",
+            str(flask.g.startDatetime)
+            + " - "
+            + remote_addr.ljust(15)
+            + " - "
+            + flask.request.method.ljust(8)
+            + flask.request.path
+            + " - "
+            + str(response.status_code),
+        )
+    except Exception:
+        pass
     return response
 
 
+# Main page handler
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
-def main(path: str) -> tuple[str,int]:
+def main(path: str) -> tuple[str, int]:
     pageContent = get("pages/" + path + "/index.html")
     statusCode = flask.g.lastGet
     jsonRawData = get("pages/" + path + "/multiplex64.json")
@@ -107,20 +157,24 @@ def main(path: str) -> tuple[str,int]:
         + "'>"
     )
 
-    return replace(
-        get("system/index.html"),
-        {
-            "stylecontent": ("<style>" + get("system/style.css") + "</style>"),
-            "scriptcontent": ("<script>" + get("system/script.js") + "</script>"),
-            "metacontent": metaData,
-            "pagecontent": pageContent,
-        },
-    ), statusCode
+    return (
+        replace(
+            get("system/index.html"),
+            {
+                "stylecontent": ("<style>" + get("system/style.css") + "</style>"),
+                "scriptcontent": ("<script>" + get("system/script.js") + "</script>"),
+                "metacontent": metaData,
+                "pagecontent": pageContent,
+            },
+        ),
+        statusCode,
+    )
 
 
+# Allow javascript Fetch to get page content without full reload
 @app.route("/null/page/", defaults={"path": ""})
 @app.route("/null/page/<path:path>")
-def null_page(path: str) ->  tuple[typing.Any,int]:
+def null_page(path: str) -> tuple[typing.Any, int]:
     pageContent = get("pages/" + path + "/index.html")
     statusCode = flask.g.lastGet
     jsonRawData = get("pages/" + path + "/multiplex64.json")
@@ -135,9 +189,14 @@ def null_page(path: str) ->  tuple[typing.Any,int]:
     jsonData["data"]["html"] = pageContent
     return jsonData, statusCode
 
+# Allow Access to System/ folder
+@app.route("/null/system/<path:path>")
+def null_system(path: str) -> flask.Response:
+    return flask.send_from_directory("system", path)
+
 
 @app.route("/null/server-update/", methods=["POST"])
-def updateServer():
+def update_server():
     abort_code = 403
     if "X-Github-Event" not in flask.request.headers:
         flask.abort(abort_code)
@@ -163,284 +222,18 @@ def updateServer():
     return "Updated PythonAnywhere successfully", 200
 
 
-"""
-# Read text file and return content
-def get(page: str):
-    try:
-        with open(page, "r") as file:
-            return file.read()
-    except Exception:
-        return error(404)
+# Catch all errors
+@app.errorhandler(Exception)
+def handle_exception(e: Exception):
+    return http_response(500, "Unknown failure"), 500
 
 
-# Append data to a JSON log
-def appendLog(filePath:str, toAppend:str):
-    try:
-        with open(filePath, "a") as file:
-            file.write("\n" + toAppend)
-    except Exception as e:
-        print(e)
-
-
-# Handle errors
-def error(e:int=500, msg:str=""):
-    try:
-        with (
-            open("system/http-response.json", "r") as file,
-            open("system/http-response.html", "r") as html,
-        ):
-            data = json.loads(file.read())[str(e)]
-            return (
-                replace(
-                    html.read(),
-                    error=str(e),
-                    errorinfo=data["message"],
-                    errormessage=msg,
-                    errordescription=data["description"],
-                ),
-                str(e),
-            )
-    except Exception:
-        return (
-            "500 Internal Server Error - Critical Failure of Error Handling System.",
-            500,
-        )
-
-
-# Handle user pages
-def mainPageHandler(dir):
-    pageContent = get("pages/" + "/".join(dir) + "/index.html")
-    jsonRawData = get("pages/" + "/".join(dir) + "/multiplex64.json")
-
-    if isinstance(pageContent, tuple):
-        jsonRawData = get("system/error.json")
-    else:
-        pageContent = (pageContent, None)
-        if isinstance(jsonRawData, tuple):
-            jsonRawData = get("system/default.json")
-    jsonData = json.loads(jsonRawData)
-
-    metaData = (
-        "<title>"
-        + jsonData["meta"]["title"]
-        + "</title><meta name='description' content='"
-        + jsonData["meta"]["description"]
-        + "'><link rel='canonical' href='"
-        + jsonData["meta"]["canonical"]
-        + "'>"
-    )
-
-    return (
-        replace(
-            get("system/index.html"),
-            stylecontent=("<style>" + get("system/style.css") + "</style>"),
-            scriptcontent=("<script>" + get("system/script.js") + "</script>"),
-            metacontent=metaData,
-            pagecontent=pageContent[0],
-        ),
-        pageContent[1],
-    )
-
-
-# Send page data to user to load a page without full refresh
-def smartPageHandler(dir):
-    pageContent = get("pages/" + "/".join(dir) + "/index.html")
-    jsonRawData = get("pages/" + "/".join(dir) + "/multiplex64.json")
-
-    if isinstance(pageContent, tuple):
-        jsonRawData = get("system/error.json")
-    else:
-        pageContent = (pageContent, None)
-        if isinstance(jsonRawData, tuple):
-            jsonRawData = get("system/default.json")
-    jsonData = json.loads(jsonRawData)
-    jsonData["data"] = {}
-    jsonData["data"]["html"] = pageContent[0]
-    return jsonData, pageContent[1]
-
-
-# Update the Pythonanywhere server using Github Webhooks
-def updateServer():
-    abort_code = 403
-    if "X-Github-Event" not in flask.request.headers:
-        flask.abort(abort_code)
-    if "X-Github-Delivery" not in flask.request.headers:
-        flask.abort(abort_code)
-
-    if not flask.request.is_json:
-        flask.abort(abort_code)
-    if "User-Agent" not in flask.request.headers:
-        flask.abort(abort_code)
-    ua = flask.request.headers.get("User-Agent")
-    if not ua.startswith("GitHub-Hookshot/"):
-        flask.abort(abort_code)
-
-    event = flask.request.headers.get("X-GitHub-Event")
-    if event == "ping":
-        return json.dumps({"Response": "Ping OK!"})
-    if event != "push":
-        return json.dumps({"Response": "Wrong event type"})
-
-    repo = git.cmd.Git("https://github.com/Multiplex64/Multiplex64/")
-    repo.pull("origin", "main")
-    return "Updated PythonAnywhere successfully", 200
-
-
-app = flask.Flask(__name__)
-
-
-# Apply custom error handling
+# Catch HTTP errors
 @app.errorhandler(werkzeug.exceptions.HTTPException)
-def handleError(e):
-    return error(e.code)
-
-
-@app.before_request
-def before_request():
-    flask.g.startDatetime = datetime.datetime.now(datetime.timezone.utc)
-    flask.g.startTime = time.time()
-
-
-# Log responses
-@app.after_request
-def afterRequest(response):
-    if flask.request.environ.get("HTTP_X_FORWARDED_FOR") is None:
-        remote_addr = flask.request.environ["REMOTE_ADDR"]
-    else:
-        remote_addr = flask.request.environ["HTTP_X_FORWARDED_FOR"]
-
-    appendLog(
-        "database/http-log-machine-readable.txt",
-        json.dumps(
-            {
-                "info": {
-                    "request-time-utc": flask.g.startTime,
-                    "response-time-ms": 1000 * (time.time() - flask.g.startTime),
-                },
-                "response": {
-                    "status_code": response.status_code,
-                },
-                "request": {
-                    "method": flask.request.method,
-                    "path": flask.request.path,
-                    "remote_addr": remote_addr,
-                    "user_agent": flask.request.user_agent.string,
-                    "referrer": flask.request.referrer,
-                },
-            }
-        ),
-    )
-    appendLog(
-        "database/http-log-human-readable.txt",
-        str(flask.g.startDatetime)
-        + " - "
-        + remote_addr.ljust(15)
-        + " - "
-        + flask.request.method.ljust(8)
-        + flask.request.path
-        + " - "
-        + str(response.status_code),
-    )
-    return response
-
-
-@app.route(
-    "/",
-    defaults={"path": ""},
-    methods=[
-        "GET",
-        "HEAD",
-        "POST",
-        "PUT",
-        "DELETE",
-        "CONNECT",
-        "OPTIONS",
-        "TRACE",
-        "PATCH",
-    ],
-)
-@app.route(
-    "/<path:path>",
-    methods=[
-        "GET",
-        "HEAD",
-        "POST",
-        "PUT",
-        "DELETE",
-        "CONNECT",
-        "OPTIONS",
-        "TRACE",
-        "PATCH",
-    ],
-)
-def main(path):
-    dir = path.split("/")
-    if flask.request.method == "GET":
-        match dir[0]:
-            case "null":
-                del dir[0]
-                if not dir:
-                    flask.abort(404)
-                match dir[0]:
-                    case "test":
-                        return "GET Test OK!", 200
-                    case "system":
-                        del dir[0]
-                        if not dir:
-                            flask.abort(404)
-                        if os.path.splitext("/".join(dir))[1]:
-                            if os.path.isfile("system/" + "/".join(dir)):
-                                return flask.send_from_directory(
-                                    "system", "/".join(dir)
-                                )
-                            else:
-                                flask.abort(404)
-                    case "page":
-                        del dir[0]
-                        return smartPageHandler(dir)
-                    case "file":
-                        del dir[0]
-                        if not dir:
-                            flask.abort(404)
-                        if os.path.splitext("/".join(dir))[1]:
-                            if os.path.isfile("pages/" + "/".join(dir)):
-                                return flask.send_from_directory("pages", "/".join(dir))
-                            else:
-                                flask.abort(404)
-                    case _:
-                        flask.abort(404)
-            case "alt":
-                del dir[0]
-                if os.path.splitext("/".join(dir))[1]:
-                    if os.path.isfile("alt/" + "/".join(dir)):
-                        return flask.send_from_directory("alt", "/".join(dir))
-                    else:
-                        flask.abort(404)
-                else:
-                    return get("alt/" + "/".join(dir) + "/index.html")
-            case _:
-                if os.path.splitext("/".join(dir))[1]:
-                    if os.path.isfile("pages/" + "/".join(dir)):
-                        return flask.send_from_directory("pages", "/".join(dir))
-                    else:
-                        flask.abort(404)
-                else:
-                    return mainPageHandler(dir)
-    elif flask.request.method == "POST":
-        match dir[0]:
-            case "null":
-                del dir[0]
-                if not dir:
-                    flask.abort(404)
-                match dir[0]:
-                    case "test":
-                        return {"response": "POST Test OK!"}, 200
-                    case "server-update":
-                        return updateServer()
-                    case _:
-                        flask.abort(404)
-            case _:
-                flask.abort(404)
-    else:
-        flask.abort(405)
-"""
+def handle_http_response(e: werkzeug.exceptions.HTTPException) -> tuple[str, int]:
+    errorCode = e.code
+    message = ""
+    if errorCode is None:
+        errorCode = 500
+        message = "Unexpected error state in werkzeug"
+    return html_wrap(http_response(errorCode, message)), errorCode
