@@ -1,3 +1,4 @@
+import os
 import json
 import time
 import datetime
@@ -90,11 +91,11 @@ def before_request() -> None:
 @app.after_request
 def after_request(response: flask.Response) -> flask.Response:
     try:
-        if flask.request.environ.get('HTTP_X_FORWARDED_FOR') is None:
-            remote_addr = flask.request.environ['REMOTE_ADDR']
+        if flask.request.environ.get("HTTP_X_FORWARDED_FOR") is None:
+            remote_addr = flask.request.environ["REMOTE_ADDR"]
         else:
-            remote_addr = flask.request.environ['HTTP_X_FORWARDED_FOR']
-        
+            remote_addr = flask.request.environ["HTTP_X_FORWARDED_FOR"]
+
         appendLog(
             "database/http-log-machine-readable.txt",
             json.dumps(
@@ -135,39 +136,56 @@ def after_request(response: flask.Response) -> flask.Response:
 # Main page handler
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
-def main(path: str) -> tuple[str, int]:
-    pageContent = get("pages/" + path + "/index.html")
-    statusCode = flask.g.lastGet
-    jsonRawData = get("pages/" + path + "/multiplex64.json")
-
-    if statusCode != 200:
-        jsonRawData = get("system/error.json")
+def main(path: str) -> flask.Response:
+    if os.path.isfile("pages/" + path):
+        return flask.send_from_directory("pages", path)
     else:
-        if flask.g.lastGet != 200:
-            jsonRawData = get("system/default.json")
-    jsonData = json.loads(jsonRawData)
+        pageContent = get("pages/" + path + "/index.html")
+        statusCode = flask.g.lastGet
+        jsonRawData = get("pages/" + path + "/multiplex64.json")
 
-    metaData = (
-        "<title>"
-        + jsonData["meta"]["title"]
-        + "</title><meta name='description' content='"
-        + jsonData["meta"]["description"]
-        + "'><link rel='canonical' href='"
-        + jsonData["meta"]["canonical"]
-        + "'>"
-    )
+        if statusCode != 200:
+            jsonRawData = get("system/error.json")
+        else:
+            if flask.g.lastGet != 200:
+                jsonRawData = get("system/default.json")
+        jsonData = json.loads(jsonRawData)
 
+        metaData = (
+            "<title>"
+            + jsonData["meta"]["title"]
+            + "</title><meta name='description' content='"
+            + jsonData["meta"]["description"]
+            + "'><link rel='canonical' href='"
+            + jsonData["meta"]["canonical"]
+            + "'>"
+        )
+        response = flask.make_response(
+            replace(
+                get("system/index.html"),
+                {
+                    "stylecontent": ("<style>" + get("system/style.css") + "</style>"),
+                    "scriptcontent": (
+                        "<script>" + get("system/script.js") + "</script>"
+                    ),
+                    "metacontent": metaData,
+                    "pagecontent": pageContent,
+                },
+            ),
+            statusCode,
+        )
+        return response
+
+
+@app.route("/null/<path:path>")
+def null(path: str) -> tuple[str, int]:
     return (
-        replace(
-            get("system/index.html"),
-            {
-                "stylecontent": ("<style>" + get("system/style.css") + "</style>"),
-                "scriptcontent": ("<script>" + get("system/script.js") + "</script>"),
-                "metacontent": metaData,
-                "pagecontent": pageContent,
-            },
+        html_wrap(
+            http_response(
+                404, "File/Directory Not Found - Requested Path: /null/" + path
+            )
         ),
-        statusCode,
+        404,
     )
 
 
@@ -188,6 +206,7 @@ def null_page(path: str) -> tuple[typing.Any, int]:
     jsonData["data"] = {}
     jsonData["data"]["html"] = pageContent
     return jsonData, statusCode
+
 
 # Allow Access to System/ folder
 @app.route("/null/system/<path:path>")
@@ -222,10 +241,12 @@ def update_server():
     return "Updated PythonAnywhere successfully", 200
 
 
+"""
 # Catch all errors
 @app.errorhandler(Exception)
 def handle_exception(e: Exception):
     return http_response(500, "Unknown failure"), 500
+"""
 
 
 # Catch HTTP errors
