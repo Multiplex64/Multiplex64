@@ -218,7 +218,7 @@ def null_test():
 # Allow Javascript Fetch to Get Page Content Without Full Site Reload
 @app.route("/null/page/", defaults={"path": ""})
 @app.route("/null/page/<path:path>")
-def null_page(path: str) -> tuple[typing.Any, int]:
+def null_page(path: str) -> tuple[dict[str, typing.Any], int]:
     page_content = get("pages/" + path + "/index.html")
     status_code = flask.g.last_get
     raw_json = get("pages/" + path + "/multiplex64.json")
@@ -236,7 +236,7 @@ def null_page(path: str) -> tuple[typing.Any, int]:
 
 # Update Server Using Github Webhooks
 @app.route("/null/server-update/", methods=["POST"])
-def update_server():
+def update_server() -> tuple[str, int]:
     abort_code = 403
     if "X-Github-Event" not in flask.request.headers:
         flask.abort(abort_code)
@@ -252,10 +252,8 @@ def update_server():
         flask.abort(abort_code)
 
     event = flask.request.headers.get("X-GitHub-Event")
-    if event == "ping":
-        return json.dumps({"Response": "Ping OK!"})
     if event != "push":
-        return json.dumps({"Response": "Wrong event type"})
+        return "Wrong Event type", abort_code
 
     repo = git.cmd.Git("https://github.com/Multiplex64/Multiplex64/")  # type: ignore
     repo.pull("origin", "main")  # type: ignore
@@ -264,7 +262,7 @@ def update_server():
 
 # Catch All Unhandled Errors
 @app.errorhandler(Exception)
-def handle_exception(e: Exception):
+def handle_exception(e: Exception) -> tuple[str, int]:
     return respond(500, "Unknown Internal Failure"), 500
 
 
