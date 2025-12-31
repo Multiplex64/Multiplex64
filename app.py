@@ -257,7 +257,7 @@ def update_server() -> tuple[str, int]:
 
     repo = git.Repo("https://github.com/Multiplex64/Multiplex64/")
     repo.remotes.origin.pull()
-    repo.git.submodule('update', '--init')
+    # repo.git.submodule('update', '--init')
     return "Updated PythonAnywhere successfully", 200
 
 
