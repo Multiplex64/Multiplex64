@@ -261,10 +261,12 @@ def update_server() -> tuple[str, int]:
     return "Updated PythonAnywhere successfully", 200
 
 
+"""
 # Catch All Unhandled Errors
 @app.errorhandler(Exception)
 def handle_exception(e: Exception) -> tuple[str, int]:
     return respond(500, "Unknown Internal Failure"), 500
+"""
 
 
 # Catch HTTP errors
