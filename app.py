@@ -1,19 +1,17 @@
+# Libraries built into Python
 import os
 import json
 import time
 import datetime
 import typing
 
-
+# Git, Werkzeug and Flask install required!
 import git
 import werkzeug.exceptions
 import flask
 
 
-# Git, Werkzeug and Flask Required!
-
-
-# List of All HTTP Methods
+# List of all HTTP methods
 methods = [
     "GET",
     "HEAD",
@@ -27,7 +25,7 @@ methods = [
 ]
 
 
-# Insert Content into Template Text
+# Insert content into template file, variables wrapped with {{curly brackets}}
 def replace(input_text: str, to_insert: dict[str, str]) -> str:
     text = input_text
     for key, value in to_insert.items():
@@ -35,16 +33,18 @@ def replace(input_text: str, to_insert: dict[str, str]) -> str:
     return text
 
 
-# Append Data to a Log
+# Append data to a log
 def append_log(file_path: str, to_append: str) -> None:
     try:
         with open(file_path, "a") as file:
             file.write("\n" + to_append)
+    except FileNotFoundError:
+        print("File Not Found")
     except Exception as e:
         print(e)
 
 
-# Read Text File and Return Content, Return a 404 page if Not Found
+# Read HTML file and return contents, return 404 page if not found
 def get(page: str) -> str:
     try:
         with open(page, "r") as file:
@@ -55,7 +55,7 @@ def get(page: str) -> str:
         return respond(404)
 
 
-# Wrap an HTML Fragment Page with Outer Tags
+# Wrap an HTML fragment with outer tags and styling
 def wrap(content: str) -> str:
     try:
         with open("system/wrapper.html", "r") as file:
@@ -70,7 +70,7 @@ def wrap(content: str) -> str:
         return respond(500, "Error While Generating Page")
 
 
-# Generate a Generic HTTP Response Page
+# Generate a generic HTTP response page
 def respond(e: int = 500, msg: str = "") -> str:
     try:
         with (
@@ -96,13 +96,15 @@ def respond(e: int = 500, msg: str = "") -> str:
 app = flask.Flask(__name__)
 
 
+# Run code upon starting the server
 with app.app_context():
-    directories = ["database/","log/"]
+    directories = ["database/", "log/"]
     for directory in directories:
         if not os.path.exists(directory):
             os.makedirs(directory)
 
 
+# Init code at the start of every request
 @app.before_request
 def before_request() -> None:
     flask.g.last_get = 404
@@ -110,6 +112,7 @@ def before_request() -> None:
     flask.g.start_time = time.time()
 
 
+# Process and log data before returning response
 @app.after_request
 def after_request(response: flask.Response) -> flask.Response:
     try:
@@ -119,7 +122,7 @@ def after_request(response: flask.Response) -> flask.Response:
             remote_addr = flask.request.environ["HTTP_X_FORWARDED_FOR"]
 
         append_log(
-            "database/http-log-machine-readable.txt",
+            "log/http-log-machine-readable.txt",
             json.dumps(
                 {
                     "info": {
@@ -140,7 +143,7 @@ def after_request(response: flask.Response) -> flask.Response:
             ),
         )
         append_log(
-            "database/http-log-human-readable.txt",
+            "log/http-log-human-readable.txt",
             str(flask.g.start_datetime)
             + " - "
             + remote_addr.ljust(15)
@@ -155,7 +158,7 @@ def after_request(response: flask.Response) -> flask.Response:
     return response
 
 
-# Main Page Handler
+# Main page handler
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def main(path: str) -> flask.Response:
@@ -199,7 +202,7 @@ def main(path: str) -> flask.Response:
         return response
 
 
-# /alt Directory Handler
+# /alt directory handler
 @app.route("/alt/<path:path>")
 def alt(path: str):
     if os.path.isfile("alt/" + path):
@@ -210,7 +213,7 @@ def alt(path: str):
         return flask.make_response(page_content, status_code)
 
 
-# Catch Unused /null Directories
+# Catch unused /null directories
 @app.route("/null/<path:path>")
 def null(path: str) -> tuple[str, int]:
     return (
@@ -219,12 +222,13 @@ def null(path: str) -> tuple[str, int]:
     )
 
 
+# Always return 200 for testing purposes
 @app.route("/null/test/", methods=methods)
 def null_test():
     return flask.request.method + " Test OK!"
 
 
-# Allow Javascript Fetch to Get Page Content Without Full Site Reload
+# Handler that allows frontend to request page content and update site without full reload
 @app.route("/null/page/", defaults={"path": ""})
 @app.route("/null/page/<path:path>")
 def null_page(path: str) -> tuple[dict[str, typing.Any], int]:
@@ -243,7 +247,7 @@ def null_page(path: str) -> tuple[dict[str, typing.Any], int]:
     return json_dict, status_code
 
 
-# Update Server Using Github Webhooks
+# Update Pythonanywhere server using Github Webhooks
 @app.route("/null/server-update/", methods=["POST"])
 def update_server() -> tuple[str, int]:
     abort_code = 403
@@ -275,7 +279,7 @@ def update_server() -> tuple[str, int]:
 # Catch All Unhandled Errors
 @app.errorhandler(Exception)
 def handle_exception(e: Exception) -> tuple[str, int]:
-    return respond(500, "Unknown Internal Failure"), 500
+    return wrap(respond(500, "Unknown Internal Failure")), 500
 """
 
 
