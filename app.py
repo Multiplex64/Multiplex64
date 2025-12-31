@@ -257,7 +257,7 @@ def update_server() -> tuple[str, int]:
 
     repo_path = "https://github.com/Multiplex64/Multiplex64/"
     #git.cmd.Git().pull(repo_path,'main')
-    repo = git.Repo(repo_path)
+    repo = git.Repo(".")
     origin = repo.remotes.origin
     origin.pull()
     #repo.remotes.origin.pull()
