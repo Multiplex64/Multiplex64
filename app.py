@@ -3,6 +3,8 @@ import json
 import time
 import datetime
 import typing
+
+
 import git
 import werkzeug.exceptions
 import flask
@@ -92,6 +94,13 @@ def respond(e: int = 500, msg: str = "") -> str:
 
 
 app = flask.Flask(__name__)
+
+
+with app.app_context():
+    directories = ["database/","log/"]
+    for directory in directories:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
 
 @app.before_request
@@ -258,7 +267,7 @@ def update_server() -> tuple[str, int]:
     repo_path = "https://github.com/Multiplex64/Multiplex64/"
     git.cmd.Git().pull(repo_path, "main")  # type:ignore
     repo = git.Repo(".")
-    repo.git.submodule('update', '--init')
+    repo.git.submodule("update", "--init")
     return "Updated PythonAnywhere successfully", 200
 
 
