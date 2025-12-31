@@ -255,8 +255,9 @@ def update_server() -> tuple[str, int]:
     if event != "push":
         return "Wrong Event type", abort_code
 
-    repo = git.cmd.Git("https://github.com/Multiplex64/Multiplex64/")  # type: ignore
-    repo.pull("origin", "main")  # type: ignore
+    repo = git.Repo("https://github.com/Multiplex64/Multiplex64/")
+    repo.git.pull("origin", "main")
+    repo.git.submodule('update', '--init')
     return "Updated PythonAnywhere successfully", 200
 
 
