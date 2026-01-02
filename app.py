@@ -155,6 +155,7 @@ def after_request(response: flask.Response) -> flask.Response:
         )
     except Exception:
         pass
+    response.headers["X-Clacks-Overhead"] = "GNU Kshitij Gairola, Surya Narayana Murthy Nookala"
     return response
 
 
