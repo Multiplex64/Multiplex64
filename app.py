@@ -5,6 +5,7 @@ import time
 import datetime
 import typing
 
+
 # Git, Werkzeug and Flask install required!
 import git
 import werkzeug.exceptions
@@ -39,7 +40,9 @@ def append_log(file_path: str, to_append: str) -> None:
         with open(file_path, "a") as file:
             file.write("\n" + to_append)
     except FileNotFoundError:
-        print("File Not Found")
+        os.makedirs(os.path.dirname(os.path.abspath(file_path)))
+        with open(file_path, "w") as file:
+            file.write(to_append)
     except Exception as e:
         print(e)
 
@@ -96,12 +99,14 @@ def respond(e: int = 500, msg: str = "") -> str:
 app = flask.Flask(__name__)
 
 
+"""
 # Run code upon starting the server
 with app.app_context():
     directories = ["database/", "log/"]
     for directory in directories:
         if not os.path.exists(directory):
             os.makedirs(directory)
+"""
 
 
 # Init code at the start of every request
@@ -115,47 +120,47 @@ def before_request() -> None:
 # Process and log data before returning response
 @app.after_request
 def after_request(response: flask.Response) -> flask.Response:
-    try:
-        if flask.request.environ.get("HTTP_X_FORWARDED_FOR") is None:
-            remote_addr = flask.request.environ["REMOTE_ADDR"]
-        else:
-            remote_addr = flask.request.environ["HTTP_X_FORWARDED_FOR"]
+    if flask.request.environ.get("HTTP_X_FORWARDED_FOR") is None:
+        remote_addr = flask.request.environ["REMOTE_ADDR"]
+    else:
+        remote_addr = flask.request.environ["HTTP_X_FORWARDED_FOR"]
 
-        append_log(
-            "database/http-log.txt",
-            json.dumps(
-                {
-                    "info": {
-                        "request-time-utc": flask.g.start_time,
-                        "response-time-ms": 1000 * (time.time() - flask.g.start_time),
-                    },
-                    "response": {
-                        "status_code": response.status_code,
-                    },
-                    "request": {
-                        "method": flask.request.method,
-                        "path": flask.request.path,
-                        "remote_addr": remote_addr,
-                        "user_agent": flask.request.user_agent.string,
-                        "referrer": flask.request.referrer,
-                    },
-                }
-            ),
-        )
-        append_log(
-            "log/http-log.txt",
-            str(flask.g.start_datetime)
-            + " - "
-            + remote_addr.ljust(15)
-            + " - "
-            + flask.request.method.ljust(8)
-            + flask.request.path
-            + " - "
-            + str(response.status_code),
-        )
-    except Exception:
-        pass
-    response.headers["X-Clacks-Overhead"] = "GNU Kshitij Gairola, Surya Narayana Murthy Nookala"
+    append_log(
+        "database/http-log.txt",
+        json.dumps(
+            {
+                "info": {
+                    "request-time-utc": flask.g.start_time,
+                    "response-time-ms": 1000 * (time.time() - flask.g.start_time),
+                },
+                "response": {
+                    "status_code": response.status_code,
+                },
+                "request": {
+                    "method": flask.request.method,
+                    "path": flask.request.path,
+                    "remote_addr": remote_addr,
+                    "user_agent": flask.request.user_agent.string,
+                    "referrer": flask.request.referrer,
+                },
+            }
+        ),
+    )
+    append_log(
+        "log/http-log.txt",
+        str(flask.g.start_datetime)
+        + " - "
+        + remote_addr.ljust(15)
+        + " - "
+        + flask.request.method.ljust(8)
+        + flask.request.path
+        + " - "
+        + str(response.status_code),
+    )
+    append_log("log/test.txt", "oh hiyes")
+    response.headers["X-Clacks-Overhead"] = (
+        "GNU Kshitij Gairola, Surya Narayana Murthy Nookala"
+    )
     return response
 
 

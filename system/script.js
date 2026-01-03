@@ -19,8 +19,8 @@ function __load() {
     anchors = document.querySelectorAll("a")
     for (var i = 0; i < anchors.length; i++) {
         anchor = anchors[i]
-        if (!anchor.classList.contains("__linkListenerApplied")) {
-            anchor.classList.add("__linkListenerApplied")
+        if (!anchor.classList.contains("_normal")) {
+            anchor.classList.add("_normal")
             if (!(/^(#|javascript:)/.test(anchor.getAttribute("href")))) {
                 anchor.addEventListener("click", function (e) {
                     _goto(this.getAttribute("href"))
@@ -62,7 +62,7 @@ function __setInnerHTML(elm, html) {
 // Navigate to a page without full reload
 async function __goMainContent(loc) {
     targetURL = new URL(loc, window.location.href)
-    const response = await fetch("/null/page" + targetURL.pathname);
+    const response = await fetch("/null/page" + targetURL.pathname + targetURL.search);
     val = await response.json();
     __setInnerHTML(document.querySelector("main"), val.data.html)
     document.title = val.meta.title
