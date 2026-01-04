@@ -43,8 +43,6 @@ def append_log(file_path: str, to_append: str) -> None:
         os.makedirs(os.path.dirname(os.path.abspath(file_path)))
         with open(file_path, "w") as file:
             file.write(to_append)
-    except Exception as e:
-        print(e)
 
 
 # Read HTML file and return contents, return 404 page if not found
@@ -281,12 +279,10 @@ def update_server() -> tuple[str, int]:
     return "Updated PythonAnywhere successfully", 200
 
 
-"""
 # Catch All Unhandled Errors
 @app.errorhandler(Exception)
 def handle_exception(e: Exception) -> tuple[str, int]:
     return wrap(respond(500, "Unknown Internal Failure")), 500
-"""
 
 
 # Catch HTTP errors
