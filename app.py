@@ -155,7 +155,6 @@ def after_request(response: flask.Response) -> flask.Response:
         + " - "
         + str(response.status_code),
     )
-    append_log("log/test.txt", "oh hiyes")
     response.headers["X-Clacks-Overhead"] = (
         "GNU Kshitij Gairola, Surya Narayana Murthy Nookala"
     )
