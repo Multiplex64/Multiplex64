@@ -1,0 +1,9 @@
+{
+    "meta":{
+        "live": false,
+        "name": "Text Effects",
+        "title":"Text Effects",
+        "description":"Apply special effects to text.",
+        "canonical":"/text-effects/"
+    }
+}

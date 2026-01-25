@@ -1,0 +1,40 @@
+<div class="_standard">
+    Text Effects
+    <br><br>
+    Input
+    <br>
+    <textarea id="input" oninput="applyEffects();">Hello, world!</textarea>
+    <br><br>
+    <button onclick="applyEffects();">Go!</button>
+    <br><br>
+    Output
+    <br><br>
+    <div id="output"></div>
+</div>
+<script>
+    function applyEffects() {
+        input = document.getElementById("input").value
+        output = document.getElementById("output")
+        function alternatingCaps(str) {
+            return str.replace(/\w(.|$)/g, s => s[0].toUpperCase() + (s[1] ? s[1].toLowerCase() : ''));
+        }
+        function smallCaps(str) {
+            normal = "abcdefghijklmnopqrstuvwxyz"
+            smallCaps = "ᴀʙᴄᴅᴇғɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢ"
+            out = str
+            for (let i = 0; i < normal.length; i++) {
+                out = out.replaceAll(normal[i], smallCaps[i])
+            }
+            return out;
+
+        }
+        output.innerHTML = (
+            "ALL CAPS <br><pre>" + input.toUpperCase()
+            + "</pre><br><br> lowercase <br><pre>" + input.toLowerCase()
+            + "</pre><br><br> AlTeRnAtInG CaPs <br><pre>" + alternatingCaps(input)
+            + "</pre><br><br> Sᴍᴀʟʟ Cᴀᴘs <br><pre>" + smallCaps(input)
+            + "</pre>"
+        )
+    }
+    applyEffects()
+</script>
