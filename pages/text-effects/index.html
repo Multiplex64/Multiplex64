@@ -8,7 +8,8 @@
     <button onclick="applyEffects();">Go!</button>
     <br><br>
     Output
-    <br><br>
+    <br>
+    <hr>
     <div id="output"></div>
 </div>
 <script>
@@ -29,13 +30,28 @@
 
         }
         output.innerHTML = (
-            "ALL CAPS <br><pre>" + input.toUpperCase()
-            + "</pre><br><br> lowercase <br><pre>" + input.toLowerCase()
-            + "</pre><br><br> AlTeRnAtInG CaPs <br><pre>" + alternatingCaps(input)
-            + "</pre><br><br> Sᴍᴀʟʟ Cᴀᴘs <br><pre>" + smallCaps(input)
-            + "</pre><br><br> S p a c e d &nbsp; O u t <br><pre>" + input.split('').join(' ')
+            "ALL CAPS <br><pre class='te'>" + input.toUpperCase()
+            + "</pre><hr> lowercase <br><pre class='te'>" + input.toLowerCase()
+            + "</pre><hr> AlTeRnAtInG CaPs <br><pre class='te'>" + alternatingCaps(input)
+            + "</pre><hr> Sᴍᴀʟʟ Cᴀᴘs <br><pre class='te'>" + smallCaps(input)
+            + "</pre><hr> S p a c e d &nbsp; O u t <br><pre class='te'>" + input.split('').join(' ')
             + "</pre>"
         )
+        teElements = document.getElementsByClassName("te")
+        for (let i = 0; i < teElements.length; i++) {
+            teElements[i].insertAdjacentHTML("afterend", "<button onclick='copyText(this)'>Copy</button>")
+        }
+    }
+    async function copyText(elm) {
+        try {
+            await navigator.clipboard.writeText(elm.previousElementSibling.innerText);
+            elm.innerHTML = "Copied!"
+        } catch (err) {
+            elm.innerHTML = "Error: Failed to Copy to Clipboard"
+        }
+        setTimeout(() => {
+            elm.innerHTML = "Copy"
+        }, 2000);
     }
     applyEffects()
 </script>
