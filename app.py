@@ -213,6 +213,8 @@ def alt(path: str):
     else:
         page_content = get("alt/" + path + "/index.html")
         status_code = flask.g.last_get
+        if status_code != 200:
+            page_content = wrap(page_content)
         return flask.make_response(page_content, status_code)
 
 

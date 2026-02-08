@@ -91,7 +91,9 @@ function __toggleNav() {
 // Go to page
 async function _goto(loc) {
     if (/^(?:[a-z]+:)|^(\/null|\/alt)/.test(loc)) {
-        userConfirm = confirm("You are leaving Multiplex64. Are you sure you want to proceed?");
+        // Confirm box disabled
+        // userConfirm = confirm("You are leaving Multiplex64. Are you sure you want to proceed?");
+        userConfirm = true
         if (userConfirm) {
             window.location.href = loc
         }

@@ -68,6 +68,11 @@ hr {
     background-color: #000;
 }
 
+pre {
+    white-space: pre-wrap;
+    overflow-x:auto;
+}
+
 /* System Styles */
 
 #__topBar {
