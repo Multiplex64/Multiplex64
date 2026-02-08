@@ -29,12 +29,20 @@
             return out;
 
         }
+        function escapeHTML(unsafe) {
+            return unsafe
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        };
         output.innerHTML = (
-            "ALL CAPS <br><pre class='te'>" + input.toUpperCase()
-            + "</pre><hr> lowercase <br><pre class='te'>" + input.toLowerCase()
-            + "</pre><hr> AlTeRnAtInG CaPs <br><pre class='te'>" + alternatingCaps(input)
-            + "</pre><hr> Sᴍᴀʟʟ Cᴀᴘs <br><pre class='te'>" + smallCaps(input)
-            + "</pre><hr> S p a c e d &nbsp; O u t <br><pre class='te'>" + input.split('').join(' ')
+            "ALL CAPS <br><pre class='te'>" + escapeHTML(input.toUpperCase())
+            + "</pre><hr> lowercase <br><pre class='te'>" + escapeHTML(input.toLowerCase())
+            + "</pre><hr> AlTeRnAtInG CaPs <br><pre class='te'>" + escapeHTML(alternatingCaps(input))
+            + "</pre><hr> Sᴍᴀʟʟ Cᴀᴘs <br><pre class='te'>" + escapeHTML(smallCaps(input))
+            + "</pre><hr> S p a c e d &nbsp; O u t <br><pre class='te'>" + escapeHTML(input.split('').join(' '))
             + "</pre>"
         )
         teElements = document.getElementsByClassName("te")
