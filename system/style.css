@@ -1,15 +1,21 @@
 /* Global Styles */
 
-body,
 button,
 input,
 textarea,
 select {
     font-family: "Courier New", monospace;
     font-size: 16px;
+
+    &:disabled {
+        background-color: #e8e8e8;
+        color: #181818;
+    }
 }
 
 body {
+    font-family: "Courier New", monospace;
+    font-size: 16px;
     margin: 0;
     padding: 0;
 }
@@ -70,7 +76,7 @@ hr {
 
 pre {
     white-space: pre-wrap;
-    overflow-x:auto;
+    overflow-x: auto;
 }
 
 /* System Styles */
