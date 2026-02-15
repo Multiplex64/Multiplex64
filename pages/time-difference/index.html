@@ -1,0 +1,39 @@
+<div class="_standard">
+    Time Difference Calculator
+    <br><br>
+    Input
+    <br>
+    <input type="datetime-local" value="2026-01-01T00:00" id="beforeDate" oninput="getDateDiff();">
+    to
+    <input type="datetime-local" id="afterDate" oninput="getDateDiff();">
+    <br>
+    <br>
+    Output
+    <br>
+    <div id="output"></div>
+    <script>
+        function getDateDiff() {
+            startDate = new Date(document.getElementById("beforeDate").value)
+            endDate = new Date(document.getElementById("afterDate").value)
+            dateMS = endDate - startDate
+            dateSec = dateMS / 1000
+            dateMin = dateSec / 60
+            dateHour = dateMin / 60
+            dateDay = dateHour / 24
+            dateWeek = dateDay / 7
+            output = document.getElementById("output")
+            output.innerHTML = (
+                dateMS + " Milliseconds <br>" +
+                dateSec + " Seconds <br>" +
+                dateMin + " Minutes <br>" +
+                dateHour + " Hours <br>" +
+                dateDay + " Days <br>" +
+                dateWeek + " Weeks"
+            )
+        }
+        var now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('afterDate').value = now.toISOString().slice(0, 16);
+        getDateDiff()
+    </script>
+</div>
