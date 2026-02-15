@@ -1,16 +1,45 @@
-<div class="_standard">
-    HTML Playground
-    <br><br>
-    Output
-    <iframe id="html-iframe" style="height:50vh"></iframe>
-    HTML
-    <textarea id="html-input" oninput="insertHTML(this.value)" rows="16">Hello, world!</textarea>
-    <script>
-        function insertHTML(value){
-            output = document.getElementById("html-iframe")
-            output.srcdoc = value;
-        }
-        document.getElementById("html-input").value = "Hello, world!\n<br>\n<b>I was looking through some logs and it looks like we have some students from Illinois visiting!</b>\n<br>\n<i>you guys better not be playing playing games in class with this >:)</i>"
-        insertHTML(document.getElementById("html-input").value)
-    </script>
+<div style="height:32px">HTML Playground</div>
+<div style="display:flex;height:calc(100% - 32px);width: 100%;">
+    <div style="display:grid;grid-template-rows:32px 1fr;width:512px;" id="left">
+        <div>Input</div>
+        <textarea id="html-input" oninput="insertHTML(this.value)"
+            style="height:100%;resize:none;">Hello, world!</textarea>
+    </div>
+    <div style="background-color: black;width: 4px;border:4px solid white;height: calc(100% - 8px);cursor: col-resize;"
+        id="center"></div>
+    <div style="display:grid;grid-template-rows:32px 1fr;flex: 1;" id="right">
+        <div>Output</div>
+        <div style="height:100%;">
+            <iframe id="html-iframe" style="height:100%;resize:none;"></iframe>
+        </div>
+    </div>
 </div>
+<script>
+    function insertHTML(value) {
+        output = document.getElementById("html-iframe")
+        output.srcdoc = value;
+    }
+    document.getElementById("html-input").value = "Hello, world!\n<br>\n<b>I was looking through some logs and it looks like we have some students from Illinois visiting!</b>\n<br>\n<i>you guys better not be playing playing games in class with this >:)</i>"
+    insertHTML(document.getElementById("html-input").value)
+
+    bar = document.getElementById("center");
+    left = document.getElementById("left");
+    mouse_is_down = false;
+
+    bar.addEventListener('mousedown', (e) => {
+        mouse_is_down = true;
+    })
+
+    document.addEventListener('mousemove', (e) => {
+        if (!mouse_is_down) return;
+        document.getElementById("html-iframe").style.display = "none";
+        left.style.width = Math.max((e.clientX - left.getBoundingClientRect().left), 64) + "px";
+    })
+
+    document.addEventListener('mouseup', () => {
+        if (mouse_is_down) {
+            mouse_is_down = false;
+            document.getElementById("html-iframe").style.display = "block";
+        }
+    })
+</script>
