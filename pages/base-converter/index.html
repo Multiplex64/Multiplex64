@@ -15,23 +15,26 @@
     <br>
     <input id="outBase" type="number" value="2" min="2" max="36" oninput="convertBase();">
     <br><br>
-    <button onclick="convertBase();">Go!</button>
+    <button onclick="convertBase(true);">Go!</button>
+    <input type="checkbox" id="autoCheck" checked><label for="autoCheck">Auto</label>
     <br><br>
     Output
     <br>
     <textarea id="output"></textarea>
 </div>
 <script>
-    function convertBase() {
-        input = document.getElementById("input")
-        inBase = document.getElementById("inBase")
-        outBase = document.getElementById("outBase")
-        output = document.getElementById("output")
-        try {
-            output.value = parseInt(input.value, inBase.value).toString(outBase.value)
-        } catch (error) {
-            output.value = "Error: " + error.message
+    function convertBase(manual) {
+        if (manual || document.getElementById("autoCheck").checked) {
+            input = document.getElementById("input")
+            inBase = document.getElementById("inBase")
+            outBase = document.getElementById("outBase")
+            output = document.getElementById("output")
+            try {
+                output.value = parseInt(input.value, inBase.value).toString(outBase.value)
+            } catch (error) {
+                output.value = "Error: " + error.message
+            }
         }
     }
-    convertBase();
+    convertBase(true);
 </script>

@@ -5,20 +5,23 @@
     <br>
     <input type="number" id="input" value="60" oninput="analyzeNum();">
     <br><br>
-    <button onclick="analyzeNum();">Go!</button>
+    <button onclick="analyzeNum(true);">Go!</button>
+    <input type="checkbox" id="autoCheck" checked><label for="autoCheck">Auto</label>
     <br><br>
     Output
     <br>
     <div id="output"></div>
 </div>
 <script>
-    function analyzeNum() {
-        input = document.getElementById("input")
-        output = document.getElementById("output")
-        num = Number(input.value)
-        output.innerHTML = ("Value: " + num
-            + "<br> Prime Factors: " + primeFactors(num)
-            + "<br> Divisible By: " + divisibleBy(num))
+    function analyzeNum(manual) {
+        if (manual || document.getElementById("autoCheck").checked) {
+            input = document.getElementById("input")
+            output = document.getElementById("output")
+            num = Number(input.value)
+            output.innerHTML = ("Value: " + num
+                + "<br> Prime Factors: " + primeFactors(num)
+                + "<br> Divisible By: " + divisibleBy(num))
+        }
     }
     function divisibleBy(n) {
         if (Number.isInteger(n)) {

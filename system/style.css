@@ -54,6 +54,14 @@ iframe {
     box-sizing: border-box;
 }
 
+input[type="checkbox"] {
+    accent-color: #2080f0;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: top;
+}
+
 button,
 .__topButton {
     background-color: #f0f0f0;

@@ -8,28 +8,34 @@
     <input type="datetime-local" id="afterDate" oninput="getDateDiff();">
     <br>
     <br>
+    <button onclick="getDateDiff(true);">Go!</button>
+    <input type="checkbox" id="autoCheck" checked><label for="autoCheck">Auto</label>
+    <br>
+    <br>
     Output
     <br>
     <div id="output"></div>
     <script>
-        function getDateDiff() {
-            startDate = new Date(document.getElementById("beforeDate").value)
-            endDate = new Date(document.getElementById("afterDate").value)
-            dateMS = endDate - startDate
-            dateSec = dateMS / 1000
-            dateMin = dateSec / 60
-            dateHour = dateMin / 60
-            dateDay = dateHour / 24
-            dateWeek = dateDay / 7
-            output = document.getElementById("output")
-            output.innerHTML = (
-                // dateMS + " Milliseconds <br>" +
-                dateSec + " Seconds <br>" +
-                dateMin + " Minutes <br>" +
-                dateHour + " Hours <br>" +
-                dateDay + " Days <br>" +
-                dateWeek + " Weeks"
-            )
+        function getDateDiff(manual) {
+            if (manual || document.getElementById("autoCheck").checked) {
+                startDate = new Date(document.getElementById("beforeDate").value)
+                endDate = new Date(document.getElementById("afterDate").value)
+                dateMS = endDate - startDate
+                dateSec = dateMS / 1000
+                dateMin = dateSec / 60
+                dateHour = dateMin / 60
+                dateDay = dateHour / 24
+                dateWeek = dateDay / 7
+                output = document.getElementById("output")
+                output.innerHTML = (
+                    // dateMS + " Milliseconds <br>" +
+                    dateSec + " Seconds <br>" +
+                    dateMin + " Minutes <br>" +
+                    dateHour + " Hours <br>" +
+                    dateDay + " Days <br>" +
+                    dateWeek + " Weeks"
+                )
+            }
         }
         var now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());

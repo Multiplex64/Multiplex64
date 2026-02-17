@@ -9,18 +9,21 @@
     <br>
     <input id="reps" type="number" value="3" oninput="repeat();">
     <br><br>
-    <button onclick="repeat();">Go!</button>
+    <button onclick="repeat(true);">Go!</button>
+    <input type="checkbox" id="autoCheck" checked><label for="autoCheck">Auto</label>
     <br><br>
     Output
     <br>
     <textarea id="output"></textarea>
 </div>
 <script>
-    function repeat() {
-        input = document.getElementById("input")
-        reps = document.getElementById("reps")
-        output = document.getElementById("output")
-        output.value = input.value.repeat(reps.value)
+    function repeat(manual) {
+        if (manual || document.getElementById("autoCheck").checked) {
+            input = document.getElementById("input")
+            reps = document.getElementById("reps")
+            output = document.getElementById("output")
+            output.value = input.value.repeat(reps.value)
+        }
     }
     repeat();
 </script>
