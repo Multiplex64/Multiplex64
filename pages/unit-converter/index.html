@@ -1,0 +1,56 @@
+<div class="_standard">
+    Unit Converter
+    <br>
+    <br>
+    Type
+    <select id="convType" onchange="updateType();"></select>
+    <br><br>
+    Convert<br>
+    <input type="number" value="2" min="0"><select id="firstSel"></select>
+    <br> to <select id="lastSel"></select>
+</div>
+<script>
+    function initUC() {
+        unitData = {
+            "speed": {
+                "Miles Per Hour":1,
+                "Feet Per Second":1.466666667,
+                "Meters Per Second":0.44704,
+                "Kilometers Per Hour":1.60934,
+                "Knots":0.868976
+            },
+            "test":{
+                "e":1,
+                "d":2
+            }
+        }
+        var convTypeIn = document.getElementById("convType")
+        var array = Object.keys(unitData)
+
+        for (var i = 0; i < array.length; i++) {
+            var option = document.createElement("option");
+            option.value = array[i];
+            option.text = array[i];
+            convTypeIn.add(option);
+        }
+        updateType();
+    }
+    function updateType(){
+        var convTypeIn = document.getElementById("convType")
+        var input = document.getElementById("firstSel")
+        var input2 = document.getElementById("lastSel")
+        input2.length = 0;
+        input.length = 0;
+        var array = Object.keys(unitData[convTypeIn.value])
+
+        for (var i = 0; i < array.length; i++) {
+            var option = document.createElement("option");
+            option.value = array[i];
+            option.text = array[i];
+            input.appendChild(option.cloneNode(true));
+            input2.appendChild(option.cloneNode(true));
+        }
+    }
+    initUC();
+
+</script>

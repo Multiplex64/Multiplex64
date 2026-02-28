@@ -212,6 +212,8 @@ main {
     margin: auto;
     padding: 8px;
     box-sizing: border-box;
+    overflow-wrap: break-word;
+    overflow-x: auto;
 }
 
 /* Small Screens */
