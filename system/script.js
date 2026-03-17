@@ -62,17 +62,35 @@ function __setInnerHTML(elm, html) {
 // Navigate to a page without full reload
 async function __goMainContent(loc) {
     targetURL = new URL(loc, window.location.href)
-    const response = await fetch("/null/page" + targetURL.pathname + targetURL.search);
-    val = await response.json();
-    __setInnerHTML(document.querySelector("main"), val.data.html)
-    document.title = val.meta.title
-    if (val.meta.description) {
-        document.querySelector('meta[name="description"]').setAttribute("content", val.meta.description);
+    function setPage(val) {
+        __setInnerHTML(document.querySelector("main"), val.data.html)
+        document.title = val.meta.title
+        if (val.meta.description) {
+            document.querySelector('meta[name="description"]').setAttribute("content", val.meta.description);
+        }
+        if (val.meta.canonical) {
+            document.querySelector('link[rel="canonical"]').setAttribute("href", val.meta.canonical);
+        }
+        __load();
     }
-    if (val.meta.canonical) {
-        document.querySelector('link[rel="canonical"]').setAttribute("href", val.meta.canonical);
+    try {
+        const response = await fetch("/null/page" + targetURL.pathname + targetURL.search)
+        const val = await response.json();
+        setPage(val);
+    } catch (error) {
+        const val = {
+            "data": {
+                "html": `<div style="text-align:center;width:100%;">
+                <h1 style="font-size:64px;margin-top:32px;margin-bottom:16px">Uh oh!</h1> <br> We couldn't connect you to our server. 
+                Check your internet connection.</div>`
+            },
+            "meta": {
+                "title": "Error",
+                "description": "A network error occured."
+            }
+        };
+        setPage(val);
     }
-    __load();
 }
 
 // Toggle Navbar
@@ -105,6 +123,28 @@ async function _goto(loc) {
         }
         if (window.location.href !== new URL(loc, window.location.href).href) {
             window.history.pushState({}, "", loc);
+        }
+    }
+}
+
+// Toggle page fullscreen
+function _fullscreen() {
+    if (!document.fullscreenElement &&
+        !document.mozFullScreenElement && !document.webkitFullscreenElement) {
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+        } else if (document.documentElement.mozRequestFullScreen) {
+            document.documentElement.mozRequestFullScreen();
+        } else if (document.documentElement.webkitRequestFullscreen) {
+            document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+        }
+    } else {
+        if (document.cancelFullScreen) {
+            document.cancelFullScreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitCancelFullScreen) {
+            document.webkitCancelFullScreen();
         }
     }
 }
