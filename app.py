@@ -11,6 +11,9 @@ import git
 import werkzeug.exceptions
 import flask
 
+# Site domain name
+domain_name = "multiplex64.pythonanywhere.com"
+
 
 # List of all HTTP methods
 methods = [
@@ -185,7 +188,13 @@ def main(path: str) -> flask.Response:
             + "</title><meta name='description' content='"
             + json_dict["meta"]["description"]
             + "'><link rel='canonical' href='"
-            + json_dict["meta"]["canonical"]
+            + "https://" + domain_name + json_dict["meta"]["canonical"]
+            + "'><meta property='og:title' content='"
+            + json_dict["meta"]["title"]
+            + "'><meta property='og:description' content='"
+            + json_dict["meta"]["description"]
+            + "'><meta property='og:url' content='"
+            + "https://" + domain_name + json_dict["meta"]["canonical"]
             + "'>"
         )
         response = flask.make_response(
@@ -249,6 +258,7 @@ def null_page(path: str) -> tuple[dict[str, typing.Any], int]:
     json_dict = json.loads(raw_json)
     json_dict["data"] = {}
     json_dict["data"]["html"] = page_content
+    json_dict["meta"]["canonical"] = "https://" + domain_name + json_dict["meta"]["canonical"]
     return json_dict, status_code
 
 

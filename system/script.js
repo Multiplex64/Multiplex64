@@ -44,32 +44,36 @@ document.addEventListener("DOMContentLoaded", function () {
     __load();
 });
 
-// Set innerHTML of an object and inject JS
-function __setInnerHTML(elm, html) {
-    elm.innerHTML = html;
-    Array.from(elm.querySelectorAll("script"))
-        .forEach(oldScriptEl => {
-            const newScriptEl = document.createElement("script");
-            Array.from(oldScriptEl.attributes).forEach(attr => {
-                newScriptEl.setAttribute(attr.name, attr.value)
-            });
-            const scriptText = document.createTextNode(oldScriptEl.innerHTML);
-            newScriptEl.appendChild(scriptText);
-            oldScriptEl.parentNode.replaceChild(newScriptEl, oldScriptEl);
-        });
-}
-
 // Navigate to a page without full reload
 async function __goMainContent(loc) {
+    // Set innerHTML of an object and inject JS
+    function setInnerHTML(elm, html) {
+        elm.innerHTML = html;
+        Array.from(elm.querySelectorAll("script"))
+            .forEach(oldScriptEl => {
+                const newScriptEl = document.createElement("script");
+                Array.from(oldScriptEl.attributes).forEach(attr => {
+                    newScriptEl.setAttribute(attr.name, attr.value)
+                });
+                const scriptText = document.createTextNode(oldScriptEl.innerHTML);
+                newScriptEl.appendChild(scriptText);
+                oldScriptEl.parentNode.replaceChild(newScriptEl, oldScriptEl);
+            });
+    }
     targetURL = new URL(loc, window.location.href)
     function setPage(val) {
-        __setInnerHTML(document.querySelector("main"), val.data.html)
+        setInnerHTML(document.querySelector("main"), val.data.html)
         document.title = val.meta.title
+        if (val.meta.title) {
+            document.querySelector('meta[property="og:title"]').setAttribute("content", val.meta.title);
+        }
         if (val.meta.description) {
             document.querySelector('meta[name="description"]').setAttribute("content", val.meta.description);
+            document.querySelector('meta[property="og:description"]').setAttribute("content", val.meta.description);
         }
         if (val.meta.canonical) {
             document.querySelector('link[rel="canonical"]').setAttribute("href", val.meta.canonical);
+            document.querySelector('meta[property="og:url"]').setAttribute("content", val.meta.canonical);
         }
         __load();
     }
