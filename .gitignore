@@ -2,6 +2,7 @@ __pycache__/
 .git/
 .venv/
 .vscode/
+.DS_Store
 
 database/
 log/
