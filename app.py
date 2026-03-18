@@ -100,16 +100,6 @@ def respond(e: int = 500, msg: str = "") -> str:
 app = flask.Flask(__name__)
 
 
-"""
-# Run code upon starting the server
-with app.app_context():
-    directories = ["database/", "log/"]
-    for directory in directories:
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-"""
-
-
 # Init code at the start of every request
 @app.before_request
 def before_request() -> None:
@@ -173,7 +163,7 @@ def main(path: str) -> flask.Response:
     else:
         page_content = get("pages/" + path + "/index.html")
         status_code = flask.g.last_get
-        raw_json = get("pages/" + path + "/multiplex64.json")
+        raw_json = get("pages/" + path + "/index.json")
 
         if status_code != 200:
             raw_json = get("system/error.json")
@@ -248,7 +238,7 @@ def null_test():
 def null_page(path: str) -> tuple[dict[str, typing.Any], int]:
     page_content = get("pages/" + path + "/index.html")
     status_code = flask.g.last_get
-    raw_json = get("pages/" + path + "/multiplex64.json")
+    raw_json = get("pages/" + path + "/index.json")
 
     if status_code != 200:
         raw_json = get("system/error.json")
