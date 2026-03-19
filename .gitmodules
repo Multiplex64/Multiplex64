@@ -1,3 +1,6 @@
 [submodule "alt/h2o"]
 	path = alt/h2o
 	url = https://github.com/h2o-app/h2o-app.github.io
+[submodule "alt/rel"]
+	path = alt/rel
+	url = https://github.com/multiplex64/rel/
