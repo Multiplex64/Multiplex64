@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://multiplex64.pythonanywhere.com/</loc>
+        <priority>1.0</priority>
+    </url>
+    <url>
+        <loc>https://multiplex64.pythonanywhere.com/base-converter/</loc>
+    </url>
+    <url>
+        <loc>https://multiplex64.pythonanywhere.com/html-playground/</loc>
+    </url>
+    <url>
+        <loc>https://multiplex64.pythonanywhere.com/number-analyzer/</loc>
+    </url>
+    <url>
+        <loc>https://multiplex64.pythonanywhere.com/text-effects/</loc>
+    </url>
+    <url>
+        <loc>https://multiplex64.pythonanywhere.com/text-repeater/</loc>
+    </url>
+    <url>
+        <loc>https://multiplex64.pythonanywhere.com/time-difference/</loc>
+    </url>
+    </url>
+</urlset>
