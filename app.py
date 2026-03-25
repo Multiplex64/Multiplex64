@@ -66,7 +66,6 @@ def wrap(content: str) -> str:
             return replace(
                 file.read(),
                 {
-                    "stylecontent": ("<style>" + get("system/style.css") + "</style>"),
                     "content": content,
                 },
             )
@@ -178,23 +177,23 @@ def main(path: str) -> flask.Response:
             + "</title><meta name='description' content='"
             + json_dict["meta"]["description"]
             + "'><link rel='canonical' href='"
-            + "https://" + domain_name + json_dict["meta"]["canonical"]
+            + "https://"
+            + domain_name
+            + json_dict["meta"]["canonical"]
             + "'><meta property='og:title' content='"
             + json_dict["meta"]["title"]
             + "'><meta property='og:description' content='"
             + json_dict["meta"]["description"]
             + "'><meta property='og:url' content='"
-            + "https://" + domain_name + json_dict["meta"]["canonical"]
+            + "https://"
+            + domain_name
+            + json_dict["meta"]["canonical"]
             + "'>"
         )
         response = flask.make_response(
             replace(
                 get("system/index.html"),
                 {
-                    "stylecontent": ("<style>" + get("system/style.css") + "</style>"),
-                    "scriptcontent": (
-                        "<script>" + get("system/script.js") + "</script>"
-                    ),
                     "metacontent": metaData,
                     "pagecontent": page_content,
                 },
@@ -248,7 +247,9 @@ def null_page(path: str) -> tuple[dict[str, typing.Any], int]:
     json_dict = json.loads(raw_json)
     json_dict["data"] = {}
     json_dict["data"]["html"] = page_content
-    json_dict["meta"]["canonical"] = "https://" + domain_name + json_dict["meta"]["canonical"]
+    json_dict["meta"]["canonical"] = (
+        "https://" + domain_name + json_dict["meta"]["canonical"]
+    )
     return json_dict, status_code
 
 
