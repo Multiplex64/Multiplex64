@@ -100,7 +100,7 @@ pre {
     border-bottom: solid 1px;
     display: flex;
     color: black;
-    overflow-y: hidden;
+    overflow: hidden;
     align-items: center;
 }
 
@@ -112,7 +112,7 @@ pre {
     height: 30px;
     border-radius: 0;
     font-size: 24px;
-    overflow-y: hidden;
+    overflow: hidden;
     position: fixed;
     color: black;
     display: block;
