@@ -55,7 +55,7 @@ def process_page(path: str) -> dict[str, typing.Any]:
     except Exception:
         html_data = generic_response(404)
         status_code = 400
-    with open("system/fallback.json", "r") as file:
+    with open("system/default.json", "r") as file:
         json_data = json.loads(file.read())
     try:
         with open("pages/" + path + "/index.json", "r") as file:
