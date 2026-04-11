@@ -6,11 +6,11 @@ import datetime
 import typing
 
 
-# Git, Werkzeug and Flask install required!
+# Git, Werkzeug, Flask and RestrictedPython install required!
 import git
 import werkzeug.exceptions
 import flask
-
+import RestrictedPython
 
 # Site data
 domain_name = "multiplex64.pythonanywhere.com"
