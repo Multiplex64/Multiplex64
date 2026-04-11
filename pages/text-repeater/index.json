@@ -1,6 +1,5 @@
 {
     "meta": {
-        "live": true,
         "name": "Test Repeater",
         "title": "Text Repeater",
         "description": "A simple text repeater.",

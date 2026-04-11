@@ -1,6 +1,5 @@
 {
     "meta": {
-        "live": true,
         "name": "Number Analyzer",
         "title": "Number Analyzer",
         "description": "A tool to analyze properties of certain numbers.",

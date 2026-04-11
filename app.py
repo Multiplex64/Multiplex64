@@ -56,6 +56,24 @@ def get(page: str) -> str:
         return respond(404)
 
 
+# process a page and return data about it
+def processPage(path: str) -> dict[str, typing.Any]:
+    internal = True
+    try:
+        with open(path + "/index.html", "r") as file:
+            html_data = file.read()
+    except Exception:
+        html_data = respond(404)
+
+    try:
+        with open(path + "/index.json", "r") as file:
+            json_data = json.loads(file.read())
+    except Exception:
+        json_data = {}
+    
+    return {"internal": internal, "html": html_data, "json": json_data}
+
+
 # Wrap an HTML fragment with outer tags and styling
 def wrap(content: str) -> str:
     try:

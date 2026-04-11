@@ -1,6 +1,5 @@
 {
     "meta": {
-        "live": true,
         "name": "Unit Converter",
         "title": "Unit Converter",
         "description": "Convert data between units.",
