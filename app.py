@@ -13,6 +13,7 @@ import flask
 
 # Site domain name
 domain_name = "multiplex64.pythonanywhere.com"
+repository_path = "https://github.com/Multiplex64/Multiplex64/"
 
 
 # List of all HTTP methods
@@ -274,10 +275,8 @@ def update_server() -> tuple[str, int]:
     if event != "push":
         return "Wrong Event type", abort_code
 
-    repo_path = "https://github.com/Multiplex64/Multiplex64/"
-    git.cmd.Git().pull(repo_path, "main")  # type:ignore
-    repo = git.Repo(".")
-    repo.git.submodule("update", "--init")
+    git.cmd.Git().pull(repository_path, "main")  # type:ignore
+    git.Repo(".").git.submodule("update", "--init")
     return "Updated PythonAnywhere successfully", 200
 
 
