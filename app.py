@@ -27,7 +27,7 @@ http_methods = [
 
 
 # Insert content into template file, variables wrapped with {{curly brackets}}
-def replace(input_text: str, to_insert: dict[str, str]) -> str:
+def insert_text(input_text: str, to_insert: dict[str, str]) -> str:
     text = input_text
     for key, value in to_insert.items():
         text = text.replace("{{" + key + "}}", str(value))
@@ -45,15 +45,15 @@ def append_log(file_path: str, to_append: str) -> None:
             file.write(to_append)
 
 
-# process a page and return data about it
-def processPage(path: str) -> dict[str, typing.Any]:
-    internal = True
-    status_code = 200
+# Process a page and return data about it
+def process_page(path: str) -> dict[str, typing.Any]:
+    external = False
     try:
         with open("pages/" + path + "/index.html", "r") as file:
             html_data = file.read()
+            status_code = 200
     except Exception:
-        html_data = respond(404)
+        html_data = generic_response(404)
         status_code = 400
     with open("system/fallback.json", "r") as file:
         json_data = json.loads(file.read())
@@ -63,7 +63,7 @@ def processPage(path: str) -> dict[str, typing.Any]:
     except Exception:
         pass
     return {
-        "internal": internal,
+        "external": external,
         "html": html_data,
         "json": json_data,
         "code": status_code,
@@ -72,27 +72,24 @@ def processPage(path: str) -> dict[str, typing.Any]:
 
 # Wrap an HTML fragment with outer tags and styling
 def wrap(content: str) -> str:
-    try:
-        with open("system/wrapper.html", "r") as file:
-            return replace(
-                file.read(),
-                {
-                    "content": content,
-                },
-            )
-    except Exception:
-        return respond(500, "Error While Generating Page")
+    with open("system/wrapper.html", "r") as file:
+        return insert_text(
+            file.read(),
+            {
+                "content": content,
+            },
+        )
 
 
 # Generate a generic HTTP response page
-def respond(e: int = 500, msg: str = "") -> str:
+def generic_response(e: int = 500, msg: str = "") -> str:
     try:
         with (
             open("system/http-response.json", "r") as file,
             open("system/http-response.html", "r") as html,
         ):
             data = json.loads(file.read())[str(e)]
-            return replace(
+            return insert_text(
                 html.read(),
                 {
                     "error": str(e),
@@ -168,8 +165,7 @@ def main(path: str) -> flask.Response:
     if os.path.isfile("pages/" + path):
         return flask.send_from_directory("pages", path)
     else:
-        page_data = processPage(path)
-
+        page_data = process_page(path)
         metaData = (
             "<title>"
             + page_data["json"]["meta"]["title"]
@@ -190,17 +186,11 @@ def main(path: str) -> flask.Response:
             + "'>"
         )
 
-
-        with (
-            open("system/index.html", "r") as outer_html,
-        ):
+        with open("system/index.html", "r") as outer_html:
             response = flask.make_response(
-                replace(
+                insert_text(
                     outer_html.read(),
-                    {
-                        "metacontent": metaData,
-                        "pagecontent": page_data["html"],
-                    },
+                    {"metacontent": metaData, "pagecontent": page_data["html"]},
                 ),
                 page_data["code"],
             )
@@ -219,7 +209,7 @@ def alt(path: str):
                 page_content = file.read()
         except Exception:
             status_code = 404
-            page_content = wrap(respond(404))
+            page_content = wrap(generic_response(404))
         return flask.make_response(page_content, status_code)
 
 
@@ -227,7 +217,11 @@ def alt(path: str):
 @app.route("/null/<path:path>")
 def null(path: str) -> tuple[str, int]:
     return (
-        wrap(respond(404, "File/Directory Not Found - Requested Path: /null/" + path)),
+        wrap(
+            generic_response(
+                404, "File/Directory Not Found - Requested Path: /null/" + path
+            )
+        ),
         404,
     )
 
@@ -242,7 +236,7 @@ def null_test():
 @app.route("/null/page/", defaults={"path": ""})
 @app.route("/null/page/<path:path>")
 def null_page(path: str) -> tuple[dict[str, typing.Any], int]:
-    page_data = processPage(path)
+    page_data = process_page(path)
     page_data["json"]["data"] = {}
     page_data["json"]["data"]["html"] = page_data["html"]
     page_data["json"]["meta"]["canonical"] = (
@@ -277,20 +271,18 @@ def update_server() -> tuple[str, int]:
     return "Updated PythonAnywhere successfully", 200
 
 
-"""
 # Catch All Unhandled Errors
 @app.errorhandler(Exception)
 def handle_exception(e: Exception) -> tuple[str, int]:
-    return wrap(respond(500, "Unknown Internal Failure")), 500
-"""
+    return wrap(generic_response(500, "Unknown Internal Failure")), 500
 
 
 # Catch HTTP errors
 @app.errorhandler(werkzeug.exceptions.HTTPException)
-def handle_respond(e: werkzeug.exceptions.HTTPException) -> tuple[str, int]:
+def handle_http_exception(e: werkzeug.exceptions.HTTPException) -> tuple[str, int]:
     error_code = e.code
     message = ""
     if error_code is None:
         error_code = 500
         message = "Unexpected Error State in Werkzeug"
-    return wrap(respond(error_code, message)), error_code
+    return wrap(generic_response(error_code, message)), error_code
