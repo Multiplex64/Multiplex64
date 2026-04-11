@@ -11,20 +11,16 @@ import git
 import werkzeug.exceptions
 import flask
 
-# Site domain name
+
+# Site data
 domain_name = "multiplex64.pythonanywhere.com"
 repository_path = "https://github.com/Multiplex64/Multiplex64/"
-
-
-# List of all HTTP methods
-methods = [
+http_methods = [
     "GET",
-    "HEAD",
     "POST",
     "PUT",
     "DELETE",
     "CONNECT",
-    "OPTIONS",
     "TRACE",
     "PATCH",
 ]
@@ -227,9 +223,9 @@ def null(path: str) -> tuple[str, int]:
 
 
 # Always return 200 for testing purposes
-@app.route("/null/test/", methods=methods)
+@app.route("/null/test/", methods=http_methods)
 def null_test():
-    return flask.request.method + " Test OK!!!"
+    return flask.request.method + " Test OK!"
 
 
 # Handler that allows frontend to request page content and update site without full reload
@@ -257,7 +253,7 @@ def null_page(path: str) -> tuple[dict[str, typing.Any], int]:
 # Update Pythonanywhere server using Github Webhooks
 @app.route("/null/server-update/", methods=["POST"])
 def update_server() -> tuple[str, int]:
-    abort_code = 403
+    abort_code = 400
     if "X-Github-Event" not in flask.request.headers:
         flask.abort(abort_code)
     if "X-Github-Delivery" not in flask.request.headers:
