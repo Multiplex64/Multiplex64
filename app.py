@@ -229,7 +229,7 @@ def null(path: str) -> tuple[str, int]:
 # Always return 200 for testing purposes
 @app.route("/null/test/", methods=methods)
 def null_test():
-    return flask.request.method + " Test OK!"
+    return flask.request.method + " Test OK!!!"
 
 
 # Handler that allows frontend to request page content and update site without full reload
