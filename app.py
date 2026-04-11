@@ -45,33 +45,29 @@ def append_log(file_path: str, to_append: str) -> None:
             file.write(to_append)
 
 
-# Read HTML file and return contents, return 404 page if not found
-def get(page: str) -> str:
-    try:
-        with open(page, "r") as file:
-            flask.g.last_get = 200
-            return file.read()
-    except Exception:
-        flask.g.last_get = 404
-        return respond(404)
-
-
 # process a page and return data about it
 def processPage(path: str) -> dict[str, typing.Any]:
     internal = True
+    status_code = 200
     try:
-        with open(path + "/index.html", "r") as file:
+        with open("pages/" + path + "/index.html", "r") as file:
             html_data = file.read()
     except Exception:
         html_data = respond(404)
-
+        status_code = 400
+    with open("system/fallback.json", "r") as file:
+        json_data = json.loads(file.read())
     try:
-        with open(path + "/index.json", "r") as file:
-            json_data = json.loads(file.read())
+        with open("pages/" + path + "/index.json", "r") as file:
+            json_data.update(json.loads(file.read()))
     except Exception:
-        json_data = {}
-    
-    return {"internal": internal, "html": html_data, "json": json_data}
+        pass
+    return {
+        "internal": internal,
+        "html": html_data,
+        "json": json_data,
+        "code": status_code,
+    }
 
 
 # Wrap an HTML fragment with outer tags and styling
@@ -96,7 +92,6 @@ def respond(e: int = 500, msg: str = "") -> str:
             open("system/http-response.html", "r") as html,
         ):
             data = json.loads(file.read())[str(e)]
-            flask.g.last_get = e
             return replace(
                 html.read(),
                 {
@@ -107,7 +102,6 @@ def respond(e: int = 500, msg: str = "") -> str:
                 },
             )
     except Exception:
-        flask.g.last_get = 500
         return "500 Internal Server Error - Critical Failure of Error Handling System."
 
 
@@ -117,7 +111,6 @@ app = flask.Flask(__name__)
 # Init code at the start of every request
 @app.before_request
 def before_request() -> None:
-    flask.g.last_get = 404
     flask.g.start_datetime = datetime.datetime.now(datetime.timezone.utc)
     flask.g.start_time = time.time()
 
@@ -175,46 +168,42 @@ def main(path: str) -> flask.Response:
     if os.path.isfile("pages/" + path):
         return flask.send_from_directory("pages", path)
     else:
-        page_content = get("pages/" + path + "/index.html")
-        status_code = flask.g.last_get
-        raw_json = get("pages/" + path + "/index.json")
-
-        if status_code != 200:
-            raw_json = get("system/error.json")
-        else:
-            if flask.g.last_get != 200:
-                raw_json = get("system/default.json")
-        json_dict = json.loads(raw_json)
+        page_data = processPage(path)
 
         metaData = (
             "<title>"
-            + json_dict["meta"]["title"]
+            + page_data["json"]["meta"]["title"]
             + "</title><meta name='description' content='"
-            + json_dict["meta"]["description"]
+            + page_data["json"]["meta"]["description"]
             + "'><link rel='canonical' href='"
             + "https://"
             + domain_name
-            + json_dict["meta"]["canonical"]
+            + page_data["json"]["meta"]["canonical"]
             + "'><meta property='og:title' content='"
-            + json_dict["meta"]["title"]
+            + page_data["json"]["meta"]["title"]
             + "'><meta property='og:description' content='"
-            + json_dict["meta"]["description"]
+            + page_data["json"]["meta"]["description"]
             + "'><meta property='og:url' content='"
             + "https://"
             + domain_name
-            + json_dict["meta"]["canonical"]
+            + page_data["json"]["meta"]["canonical"]
             + "'>"
         )
-        response = flask.make_response(
-            replace(
-                get("system/index.html"),
-                {
-                    "metacontent": metaData,
-                    "pagecontent": page_content,
-                },
-            ),
-            status_code,
-        )
+
+
+        with (
+            open("system/index.html", "r") as outer_html,
+        ):
+            response = flask.make_response(
+                replace(
+                    outer_html.read(),
+                    {
+                        "metacontent": metaData,
+                        "pagecontent": page_data["html"],
+                    },
+                ),
+                page_data["code"],
+            )
         return response
 
 
@@ -224,10 +213,13 @@ def alt(path: str):
     if os.path.isfile("alt/" + path):
         return flask.send_from_directory("alt", path)
     else:
-        page_content = get("alt/" + path + "/index.html")
-        status_code = flask.g.last_get
-        if status_code != 200:
-            page_content = wrap(page_content)
+        try:
+            with open("alt/" + path + "/index.html", "r") as file:
+                status_code = 200
+                page_content = file.read()
+        except Exception:
+            status_code = 404
+            page_content = wrap(respond(404))
         return flask.make_response(page_content, status_code)
 
 
@@ -250,22 +242,13 @@ def null_test():
 @app.route("/null/page/", defaults={"path": ""})
 @app.route("/null/page/<path:path>")
 def null_page(path: str) -> tuple[dict[str, typing.Any], int]:
-    page_content = get("pages/" + path + "/index.html")
-    status_code = flask.g.last_get
-    raw_json = get("pages/" + path + "/index.json")
-
-    if status_code != 200:
-        raw_json = get("system/error.json")
-    else:
-        if flask.g.last_get != 200:
-            raw_json = get("system/default.json")
-    json_dict = json.loads(raw_json)
-    json_dict["data"] = {}
-    json_dict["data"]["html"] = page_content
-    json_dict["meta"]["canonical"] = (
-        "https://" + domain_name + json_dict["meta"]["canonical"]
+    page_data = processPage(path)
+    page_data["json"]["data"] = {}
+    page_data["json"]["data"]["html"] = page_data["html"]
+    page_data["json"]["meta"]["canonical"] = (
+        "https://" + domain_name + page_data["json"]["meta"]["canonical"]
     )
-    return json_dict, status_code
+    return page_data["json"], page_data["code"]
 
 
 # Update Pythonanywhere server using Github Webhooks
@@ -294,10 +277,12 @@ def update_server() -> tuple[str, int]:
     return "Updated PythonAnywhere successfully", 200
 
 
+"""
 # Catch All Unhandled Errors
 @app.errorhandler(Exception)
 def handle_exception(e: Exception) -> tuple[str, int]:
     return wrap(respond(500, "Unknown Internal Failure")), 500
+"""
 
 
 # Catch HTTP errors
