@@ -1,4 +1,5 @@
 # Libraries built into Python
+import os
 import pathlib
 import json
 import time
@@ -44,20 +45,18 @@ def append_log(file_path: str, to_append: str) -> None:
 # Process a page and return data about it
 def process_page(path: str) -> dict[str, typing.Any]:
     external = False
-    try:
-        with open("pages/" + path + "/index.html", "r") as file:
+    if pathlib.Path("./pages/" + path + "/index.html").is_file():
+        with open("./pages/" + path + "/index.html", "r") as file:
             html_data = file.read()
             status_code = 200
-    except Exception:
+    else:
         html_data = generic_response(404)
         status_code = 400
-    with open("system/default.json", "r") as file:
+    with open("./system/default.json", "r") as file:
         json_data = json.loads(file.read())
-    try:
-        with open("pages/" + path + "/index.json", "r") as file:
+    if pathlib.Path("./pages/" + path + "/index.json").is_file():
+        with open("./pages/" + path + "/index.json", "r") as file:
             json_data.update(json.loads(file.read()))
-    except Exception:
-        pass
     return {
         "external": external,
         "html": html_data,
@@ -68,7 +67,7 @@ def process_page(path: str) -> dict[str, typing.Any]:
 
 # Wrap an HTML fragment with outer tags and styling
 def wrap(content: str) -> str:
-    with open("system/wrapper.html", "r") as file:
+    with open("./system/wrapper.html", "r") as file:
         return insert_text(
             file.read(),
             {
@@ -81,8 +80,8 @@ def wrap(content: str) -> str:
 def generic_response(e: int = 500, msg: str = "") -> str:
     try:
         with (
-            open("system/http-response.json", "r") as file,
-            open("system/http-response.html", "r") as html,
+            open("./system/http-response.json", "r") as file,
+            open("./system/http-response.html", "r") as html,
         ):
             data = json.loads(file.read())[str(e)]
             return insert_text(
@@ -117,7 +116,7 @@ def after_request(response: flask.Response) -> flask.Response:
         remote_addr = flask.request.environ["HTTP_X_FORWARDED_FOR"]
 
     append_log(
-        "database/http-log.txt",
+        "./database/http-log.txt",
         json.dumps(
             {
                 "info": {
@@ -138,7 +137,7 @@ def after_request(response: flask.Response) -> flask.Response:
         ),
     )
     append_log(
-        "log/http-log.txt",
+        "./log/http-log.txt",
         str(flask.g.start_datetime)
         + " - "
         + remote_addr.ljust(15)
@@ -158,8 +157,8 @@ def after_request(response: flask.Response) -> flask.Response:
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def main(path: str) -> flask.Response:
-    if pathlib.Path("pages/" + path).is_file():
-        return flask.send_from_directory("pages", path)
+    if pathlib.Path("./pages/" + path).is_file():
+        return flask.send_from_directory("./pages/", path)
     else:
         page_data = process_page(path)
         metaData = (
@@ -182,7 +181,7 @@ def main(path: str) -> flask.Response:
             + "'>"
         )
 
-        with open("system/index.html", "r") as outer_html:
+        with open("./system/index.html", "r") as outer_html:
             response = flask.make_response(
                 insert_text(
                     outer_html.read(),
@@ -196,14 +195,14 @@ def main(path: str) -> flask.Response:
 # /alt directory handler
 @app.route("/alt/<path:path>")
 def alt(path: str):
-    if pathlib.Path("alt/" + path).is_file():
-        return flask.send_from_directory("alt", path)
+    if pathlib.Path("./alt/" + path).is_file():
+        return flask.send_from_directory("./alt/", path)
     else:
-        try:
-            with open("alt/" + path + "/index.html", "r") as file:
+        if pathlib.Path("./alt/" + path + "/index.html").is_file():
+            with open("./alt/" + path + "/index.html", "r") as file:
                 status_code = 200
                 page_content = file.read()
-        except Exception:
+        else:
             status_code = 404
             page_content = wrap(generic_response(404))
         return flask.make_response(page_content, status_code)
