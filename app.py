@@ -1,5 +1,5 @@
 # Libraries built into Python
-import os
+import pathlib
 import json
 import time
 import datetime
@@ -10,7 +10,7 @@ import typing
 import git
 import werkzeug.exceptions
 import flask
-import RestrictedPython
+import RestrictedPython  # type:ignore
 
 # Site data
 domain_name = "multiplex64.pythonanywhere.com"
@@ -36,13 +36,9 @@ def insert_text(input_text: str, to_insert: dict[str, str]) -> str:
 
 # Append data to a log
 def append_log(file_path: str, to_append: str) -> None:
-    try:
-        with open(file_path, "a") as file:
-            file.write("\n" + to_append)
-    except FileNotFoundError:
-        os.makedirs(os.path.dirname(os.path.abspath(file_path)))
-        with open(file_path, "w") as file:
-            file.write(to_append)
+    pathlib.Path(file_path).resolve().parent.mkdir(parents=True, exist_ok=True)
+    with open(file_path, "a") as file:
+        file.write("\n" + to_append)
 
 
 # Process a page and return data about it
@@ -162,7 +158,7 @@ def after_request(response: flask.Response) -> flask.Response:
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def main(path: str) -> flask.Response:
-    if os.path.isfile("pages/" + path):
+    if pathlib.Path("pages/" + path).is_file():
         return flask.send_from_directory("pages", path)
     else:
         page_data = process_page(path)
@@ -200,7 +196,7 @@ def main(path: str) -> flask.Response:
 # /alt directory handler
 @app.route("/alt/<path:path>")
 def alt(path: str):
-    if os.path.isfile("alt/" + path):
+    if pathlib.Path("alt/" + path).is_file():
         return flask.send_from_directory("alt", path)
     else:
         try:
