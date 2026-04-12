@@ -6,7 +6,6 @@ import time
 import datetime
 import typing
 
-
 # Git, Werkzeug, Flask and RestrictedPython install required!
 import git
 import werkzeug.exceptions
@@ -97,6 +96,37 @@ def generic_response(e: int = 500, msg: str = "") -> str:
         return "500 Internal Server Error - Critical Failure of Error Handling System."
 
 
+# Execute potentially dangerous code, but allow for limited file access
+def safe_exec(path: str, locals: dict[str, typing.Any] = {}) -> dict[str, typing.Any]:
+    def safe_open(
+        file: typing.Any, *args: typing.Any, **kwargs: typing.Any
+    ) -> typing.Any:
+        if pathlib.Path(file).resolve().is_relative_to(pathlib.Path.cwd().resolve()):
+            return open(file, *args, **kwargs)  # type:ignore
+        else:
+            raise Exception(
+                "Cannot access files outside of directory for security reasons"
+            )
+
+    old_dir = pathlib.Path.cwd()
+    with open(path, "r") as data:
+        object = data.read()
+    byte_code = RestrictedPython.compile_restricted(  # type:ignore
+        object, filename="<inline code>", mode="exec"
+    )
+    os.chdir(pathlib.Path(path).parent)
+    exec(
+        byte_code,  # type:ignore
+        {
+            "__builtins__": RestrictedPython.safe_builtins  # type:ignore
+            | {"open": safe_open}
+        },
+        locals,
+    )
+    os.chdir(old_dir)
+    return locals
+
+
 app = flask.Flask(__name__)
 
 
@@ -114,7 +144,6 @@ def after_request(response: flask.Response) -> flask.Response:
         remote_addr = flask.request.environ["REMOTE_ADDR"]
     else:
         remote_addr = flask.request.environ["HTTP_X_FORWARDED_FOR"]
-
     append_log(
         "./database/http-log.txt",
         json.dumps(
@@ -180,7 +209,6 @@ def main(path: str) -> flask.Response:
             + page_data["json"]["meta"]["canonical"]
             + "'>"
         )
-
         with open("./system/index.html", "r") as outer_html:
             response = flask.make_response(
                 insert_text(
@@ -248,7 +276,6 @@ def update_server() -> tuple[str, int]:
         flask.abort(abort_code)
     if "X-Github-Delivery" not in flask.request.headers:
         flask.abort(abort_code)
-
     if not flask.request.is_json:
         flask.abort(abort_code)
     if "User-Agent" not in flask.request.headers:
@@ -256,11 +283,9 @@ def update_server() -> tuple[str, int]:
     ua = flask.request.headers.get("User-Agent")
     if ua and not ua.startswith("GitHub-Hookshot/"):
         flask.abort(abort_code)
-
     event = flask.request.headers.get("X-GitHub-Event")
     if event != "push":
         return "Wrong Event type", abort_code
-
     git.cmd.Git().pull(repository_path, "main")  # type:ignore
     git.Repo(".").git.submodule("update", "--init")
     return "Updated PythonAnywhere successfully", 200

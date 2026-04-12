@@ -1,8 +1,8 @@
-__pycache__/
-.git/
-.venv/
-.vscode/
+/__pycache__/
+/.git/
+/.venv/
+/.vscode/
 .DS_Store
 
-database/
-log/
+/database/
+/log/
