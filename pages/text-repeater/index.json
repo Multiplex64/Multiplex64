@@ -2,7 +2,7 @@
     "meta": {
         "name": "Test Repeater",
         "title": "Text Repeater",
-        "description": "A simple text repeater.",
+        "description": "A simple text repeater. Repeats pasted text as many times as needed.",
         "canonical":"/text-repeater/"
     }
 }

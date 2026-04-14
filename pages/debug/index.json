@@ -2,7 +2,7 @@
     "meta": {
         "name": "Multiplex64 Debug",
         "title": "Debug",
-        "description": "Tips to debug our site.",
+        "description": "Tips to debug our site. If you are experiencing issues, you can troubleshoot here.",
         "canonical":"/debug/"
     }
 }

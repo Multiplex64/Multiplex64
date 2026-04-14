@@ -2,7 +2,7 @@
     "meta": {
         "name": "Unit Converter",
         "title": "Unit Converter",
-        "description": "Convert data between units.",
+        "description": "Convert data between units. Supports many types of unit conversion.",
         "canonical": "/unit-converter/"
     }
 }

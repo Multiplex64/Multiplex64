@@ -2,7 +2,7 @@
     "meta": {
         "name": "System Data",
         "title": "System Data",
-        "description": "Information about your device.",
+        "description": "Information about your device. Displays info that JavaScript can detect from your device.",
         "canonical":"/system-data/"
     }
 }

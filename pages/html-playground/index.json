@@ -2,7 +2,7 @@
     "meta": {
         "name": "HTML Playground",
         "title": "HTML Playground",
-        "description": "An interactive HTML tester.",
+        "description": "An interactive HTML tester. iFrame-based HTML playground that supports CSS and JS.",
         "canonical":"/html-playground/"
     }
 }
