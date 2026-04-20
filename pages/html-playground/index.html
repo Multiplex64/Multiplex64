@@ -38,7 +38,7 @@
         if (!mouse_is_down) return;
         document.getElementById('__main').style.userSelect = 'none';
         document.getElementById('__main').style.webkitUserSelect = 'none';
-        document.getElementById("html-iframe").style.display = "none";
+        document.getElementById("html-iframe").style.pointerEvents = "none";
         left.style.width = Math.max((e.clientX - left.getBoundingClientRect().left), 64) + "px";
     })
 
@@ -47,7 +47,7 @@
             document.getElementById('__main').style.userSelect = 'auto';
             document.getElementById('__main').style.webkitUserSelect = 'auto';
             mouse_is_down = false;
-            document.getElementById("html-iframe").style.display = "block";
+            document.getElementById("html-iframe").style.pointerEvents = "auto";
         }
     })
 </script>
