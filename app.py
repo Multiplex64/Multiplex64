@@ -145,7 +145,7 @@ def after_request(response: flask.Response) -> flask.Response:
     else:
         remote_addr = flask.request.environ["HTTP_X_FORWARDED_FOR"]
     append_log(
-        "./database/http-log.txt",
+        "./log/http-log-mr.txt",
         json.dumps(
             {
                 "info": {
@@ -166,7 +166,7 @@ def after_request(response: flask.Response) -> flask.Response:
         ),
     )
     append_log(
-        "./log/http-log.txt",
+        "./log/http-log-hr.txt",
         str(flask.g.start_datetime)
         + " - "
         + remote_addr.ljust(15)
