@@ -1,0 +1,68 @@
+<div class="_standard">
+    Text Effects
+    <br><br>
+    Input
+    <br>
+    <textarea id="input" oninput="applyEffects();">Hello, world!</textarea>
+    <br><br>
+    <button onclick="applyEffects(true);">Go!</button>
+    <input type="checkbox" id="autoCheck" checked><label for="autoCheck">Auto</label>
+    <br><br>
+    Output
+    <br>
+    <hr>
+    <div id="output"></div>
+</div>
+<script>
+    function applyEffects(manual) {
+        if (manual || document.getElementById("autoCheck").checked) {
+            input = document.getElementById("input").value
+            output = document.getElementById("output")
+            function alternatingCaps(str) {
+                return str.replace(/\w(.|$)/g, s => s[0].toUpperCase() + (s[1] ? s[1].toLowerCase() : ''));
+            }
+            function smallCaps(str) {
+                normal = "abcdefghijklmnopqrstuvwxyz"
+                smallCaps = "ᴀʙᴄᴅᴇғɢʜɪᴊᴋʟᴍɴᴏᴘǫʀsᴛᴜᴠᴡxʏᴢ"
+                out = str
+                for (let i = 0; i < normal.length; i++) {
+                    out = out.replaceAll(normal[i], smallCaps[i])
+                }
+                return out;
+
+            }
+            function escapeHTML(unsafe) {
+                return unsafe
+                    .replaceAll("&", "&amp;")
+                    .replaceAll("<", "&lt;")
+                    .replaceAll(">", "&gt;")
+                    .replaceAll('"', "&quot;")
+                    .replaceAll("'", "&#039;");
+            };
+            output.innerHTML = (
+                "ALL CAPS <br><pre class='te'>" + escapeHTML(input.toUpperCase())
+                + "</pre><hr> lowercase <br><pre class='te'>" + escapeHTML(input.toLowerCase())
+                + "</pre><hr> AlTeRnAtInG CaPs <br><pre class='te'>" + escapeHTML(alternatingCaps(input))
+                + "</pre><hr> Sᴍᴀʟʟ Cᴀᴘs <br><pre class='te'>" + escapeHTML(smallCaps(input))
+                + "</pre><hr> S p a c e d &nbsp; O u t <br><pre class='te'>" + escapeHTML(input.split('').join(' '))
+                + "</pre>"
+            )
+            teElements = document.getElementsByClassName("te")
+            for (let i = 0; i < teElements.length; i++) {
+                teElements[i].insertAdjacentHTML("afterend", "<button onclick='copyText(this)'>Copy</button>")
+            }
+        }
+    }
+    async function copyText(elm) {
+        try {
+            await navigator.clipboard.writeText(elm.previousElementSibling.innerText);
+            elm.innerHTML = "Copied!"
+        } catch (err) {
+            elm.innerHTML = "Error: Failed to Copy to Clipboard"
+        }
+        setTimeout(() => {
+            elm.innerHTML = "Copy"
+        }, 2000);
+    }
+    applyEffects()
+</script>
