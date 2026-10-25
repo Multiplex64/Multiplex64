@@ -3,6 +3,6 @@
         "name": "Number Analyzer",
         "title": "Number Analyzer",
         "description": "A tool to analyze properties of certain numbers. Factors numbers and detects primes.",
-        "canonical":"/number-analyzer/"
+        "canonical":"/tools/number-analyzer/"
     }
 }
