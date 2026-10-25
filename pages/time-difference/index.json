@@ -1,8 +1,8 @@
 {
-    "meta": {
-        "name": "Time Difference",
-        "title": "Time Difference",
-        "description": "Find the difference in time between two timestamps. Shows time in multiple formats for convenience.",
-        "canonical": "/time-difference/"
-    }
+  "meta": {
+    "name": "Time Difference",
+    "title": "Time Difference",
+    "description": "Find the difference in time between two timestamps. Shows time in multiple formats for convenience.",
+    "canonical": "/tools/time-difference/"
+  }
 }
