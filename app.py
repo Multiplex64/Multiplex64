@@ -181,12 +181,25 @@ def after_request(response: flask.Response) -> flask.Response:
     )
     return response
 
+# Permanent redirects
+redirect_overrides = {
+    "text-repeater" : "/tools/text-repeater/",
+    "html-playground" : "/tools/html-playground/",
+    "base-converter" : "/tools/base-converter/",
+    "number-analyzer" : "/tools/number-analyzer/",
+    "text-effects" : "/tools/text-effects/",
+    "time-difference" : "/tools/time-difference/",
+}
+
 
 # Main page handler
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
-def main(path: str) -> flask.Response:
-    if pathlib.Path("./pages/" + path).is_file():
+def main(path: str) -> flask.Response | werkzeug.wrappers.response.Response:
+    redir_path = path.rstrip("/")
+    if redir_path in redirect_overrides:
+        return flask.redirect(redirect_overrides[redir_path],code=301)
+    elif pathlib.Path("./pages/" + path).is_file():
         return flask.send_from_directory("./pages/", path)
     else:
         page_data = process_page(path)
