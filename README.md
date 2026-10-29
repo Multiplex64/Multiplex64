@@ -1,6 +1,8 @@
 # Multiplex64
 Also known as `8a256` on other platforms.
 
+Student at Emerald High School
+
 Programmer and Embedded Systems nerd
 
 Software: Python, HTML/CSS, JavaScript, and C/C++, learning Shell Script and Assembly
