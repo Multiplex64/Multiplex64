@@ -183,6 +183,7 @@ def after_request(response: flask.Response) -> flask.Response:
 
 # Permanent redirects
 redirect_overrides = {
+    "future-plans" : "/roadmap/",
     "text-repeater" : "/tools/text-repeater/",
     "html-playground" : "/tools/html-playground/",
     "base-converter" : "/tools/base-converter/",
