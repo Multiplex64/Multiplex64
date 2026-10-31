@@ -1,6 +1,7 @@
 <div style="height:32px">
     HTML Playground &nbsp; <button onclick="insertHTML(true);">Go!</button>
     <input type="checkbox" id="autoCheck" checked><label for="autoCheck">Auto</label>
+    <button onclick="document.getElementById('html-iframe').requestFullscreen();"> Fullscreen </button>
 </div>
 <div style="display:flex;height:calc(100% - 32px);width: 100%;">
     <div style="display:grid;grid-template-rows:32px 1fr;width:512px;" id="left">
@@ -12,7 +13,7 @@
     <div style="display:grid;grid-template-rows:32px 1fr;flex: 1;" id="right">
         <div>Output</div>
         <div style="height:100%;">
-            <iframe id="html-iframe" style="height:100%;resize:none;"></iframe>
+            <iframe allow="fullscreen" id="html-iframe" style="height:100%;resize:none;"></iframe>
         </div>
     </div>
 </div>
@@ -23,7 +24,24 @@
             output.srcdoc = document.getElementById("html-input").value;
         }
     }
-    document.getElementById("html-input").value = "Hello, world!"
+    document.getElementById("html-input").value = (
+        `<html>
+<head>
+  <style>
+    body {
+      color: black;
+      background-color:white;
+    }
+  </style>
+</head>
+<body>
+  Hello, world! 
+  <br>
+  This page has been updated to support fullscreening the content.
+  <br>
+  Look above and find the "fullscreen" button to try!
+<body>
+</html>`)
     insertHTML(document.getElementById("html-input").value)
 
     bar = document.getElementById("center");
