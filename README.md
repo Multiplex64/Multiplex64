@@ -24,3 +24,5 @@ https://multiplex64.pythonanywhere.com
 ### Major website overhaul coming soon!
 
 Visit the site to learn more.
+
+https://google.com
